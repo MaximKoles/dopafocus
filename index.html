@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DopaFocus — Бережный трекер задач с СДВГ-фокусом</title>
   
-  <!-- Firebase SDK (v9 compat mode для чистой работы в едином файле) -->
+  <!-- Firebase SDK (v9 compat mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -194,7 +195,7 @@
     }
 
     .sync-status-dot.online { background: #10b981; box-shadow: 0 0 6px #10b981; }
-    .sync-status-dot.syncing { background: #f59e0b; animation: spin 1s infinite linear; }
+    .sync-status-dot.syncing { background: #f59e0b; }
     .sync-status-dot.error { background: #ef4444; }
 
     .trophy-counter {
@@ -477,7 +478,6 @@
       border-radius: 6px;
     }
 
-    /* Форма добавления задачи */
     .create-task-form {
       display: flex;
       flex-direction: column;
@@ -569,7 +569,6 @@
       background: var(--primary-hover);
     }
 
-    /* Карточки задач */
     .sidebar-task-list {
       display: flex;
       flex-direction: column;
@@ -1047,7 +1046,7 @@
         <!-- Кнопка Синхронизации / Облака -->
         <button class="sync-status-btn" id="btnOpenSyncModal" title="Настройка облачной синхронизации">
           <span class="sync-status-dot" id="syncStatusDot"></span>
-          <span id="syncStatusLabel">Локально</span>
+          <span id="syncStatusLabel">Синхронизация</span>
           <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
             <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
           </svg>
@@ -1066,7 +1065,7 @@
       </div>
     </header>
 
-    <!-- Поддерживающая карточка -->
+    <!-- Поддерживающая цитата -->
     <div class="quote-banner">
       <div class="quote-content">
         <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24">
@@ -1264,22 +1263,12 @@
 
       <!-- Ввод чужого пароля -->
       <div style="display: flex; flex-direction: column; gap: 6px;">
-        <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">Или введите пароль с другого устройства:</label>
+        <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">Или введите пароль со второго устройства:</label>
         <div style="display: flex; gap: 8px;">
-          <input type="text" id="inputConnectPassphrase" class="input-field" placeholder="например: луна-чай-маяк-42" style="font-family: monospace;" />
+          <input type="text" id="inputConnectPassphrase" class="input-field" placeholder="например: луна-маяк-персик-42ab" style="font-family: monospace;" />
           <button class="btn-submit" id="btnConnectVault" style="padding: 8px 14px;">Связать</button>
         </div>
       </div>
-
-      <!-- Настройки Firebase Config (раскрывающийся аккордеон для безопасности) -->
-      <details style="font-size: 0.82rem; color: var(--text-dim); border-top: 1px solid var(--border-soft); padding-top: 10px;">
-        <summary style="cursor: pointer; font-weight: 600; color: var(--text-muted);">⚙️ Настройка ключей Firebase Firestore</summary>
-        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
-          <p>Вставьте JSON вашего Firebase Config (хранится только локально в браузере):</p>
-          <textarea id="firebaseConfigInput" class="input-field" rows="4" style="font-family: monospace; font-size: 0.76rem;" placeholder='{"apiKey": "...", "projectId": "..."}'></textarea>
-          <button class="btn-submit" id="btnSaveFirebaseConfig" style="padding: 6px 12px; font-size: 0.8rem; align-self: flex-end;">Сохранить конфиг</button>
-        </div>
-      </details>
     </div>
   </div>
 
@@ -1318,11 +1307,19 @@
 
   <script>
     /* ==========================================================
-       ХРАНЕНИЕ ДАННЫХ И КОНСТАНТЫ
+       ВШИТЫЙ FIREBASE CONFIG И АВТОРИЗАЦИЯ
        ========================================================== */
-    const STORAGE_KEY_TASKS = 'dopafocus_tasks_v7';
-    const STORAGE_KEY_SETTINGS = 'dopafocus_settings_v7';
-    const STORAGE_KEY_FB_CONFIG = 'dopafocus_fb_config';
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyCxWCkKPD-giEPSnPO6Sp-Xm_CDmicQubA",
+      authDomain: "dopafocus-bc06d.firebaseapp.com",
+      projectId: "dopafocus-bc06d",
+      storageBucket: "dopafocus-bc06d.firebasestorage.app",
+      messagingSenderId: "1096725760339",
+      appId: "1:1096725760339:web:04ed63af8a492809ae79a6"
+    };
+
+    const STORAGE_KEY_TASKS = 'dopafocus_tasks_v8';
+    const STORAGE_KEY_SETTINGS = 'dopafocus_settings_v8';
     const STORAGE_KEY_VAULT = 'dopafocus_vault_id';
 
     const MOTIVATIONAL_QUOTES = [
@@ -1336,7 +1333,8 @@
 
     const WORDS_POOL = [
       'персик', 'луна', 'маяк', 'кофе', 'лес', 'ветерок', 'искра', 'янтарь',
-      'клевер', 'океан', 'рассвет', 'уют', 'салют', 'компас', 'остров', 'туман'
+      'клевер', 'океан', 'рассвет', 'уют', 'салют', 'компас', 'остров', 'туман',
+      'сосна', 'облако', 'волна', 'родник', 'лазурь', 'лагуна', 'берег', 'чай'
     ];
 
     const MONTH_LABELS = [
@@ -1356,14 +1354,15 @@
     let boosterTimerId = null;
     let isBoosterActive = false;
 
-    // Переменные Firestore и Realtime
+    // Firebase state
     let firestoreDb = null;
+    let currentAuthUser = null;
     let unsubscribeSnapshot = null;
     let syncDebounceTimer = null;
     let isRemoteUpdateInProgress = false;
 
     /* ==========================================================
-       SVG ИКОНКИ НАГРУЗКИ
+       SVG ИКОНКИ НАГРУЗКИ (Листик, Лимон, Огонёк)
        ========================================================== */
     function getLoadBadgeSvg(count) {
       if (count === 0) return '';
@@ -1437,12 +1436,18 @@
       return d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
-    function generateRandomPassphrase() {
+    // 3 слова + 2 цифры + 2 буквы (высокая энтропия)
+    function generateSecurePassphrase() {
       const w1 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
       const w2 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
       const w3 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
-      const num = Math.floor(Math.random() * 89) + 10;
-      return `${w1}-${w2}-${w3}-${num}`;
+      const digits = Math.floor(Math.random() * 89) + 10;
+      
+      const lettersCharset = 'abcdefghijklmnopqrstuvwxyz';
+      const l1 = lettersCharset[Math.floor(Math.random() * lettersCharset.length)];
+      const l2 = lettersCharset[Math.floor(Math.random() * lettersCharset.length)];
+      
+      return `${w1}-${w2}-${w3}-${digits}${l1}${l2}`;
     }
 
     function loadLocalStorage() {
@@ -1463,36 +1468,33 @@
         localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
         localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
       } catch (e) {
-        console.error("Local storage error:", e);
+        console.error("Local storage save error:", e);
       }
     }
 
     /* ==========================================================
-       ОБЛАЧНАЯ СИНХРОНИЗАЦИЯ И ОБРАБОТКА ПЕРЕГРУЗКИ (FIRESTORE)
+       FIREBASE AUTH & FIRESTORE REALTIME SYNC
        ========================================================== */
-    function initFirebase() {
-      const configStr = localStorage.getItem(STORAGE_KEY_FB_CONFIG);
-      if (!configStr) {
-        updateSyncStatusUI('offline', 'Локально');
-        return;
-      }
-
+    async function initFirebase() {
       try {
-        const config = JSON.parse(configStr);
         if (!firebase.apps.length) {
-          firebase.initializeApp(config);
+          firebase.initializeApp(FIREBASE_CONFIG);
         }
         firestoreDb = firebase.firestore();
 
-        // Подключаем хранилище, если есть активный Vault Key
+        // Фоновая анонимная авторизация
+        const authResult = await firebase.auth().signInAnonymously();
+        currentAuthUser = authResult.user;
+
+        // Если у пользователя уже есть сохраненный пароль — подключаем слушатель
         const vaultId = localStorage.getItem(STORAGE_KEY_VAULT);
         if (vaultId) {
           bindRealtimeVault(vaultId);
         } else {
-          updateSyncStatusUI('offline', 'Ключ не задан');
+          updateSyncStatusUI('offline', 'Локально');
         }
       } catch (e) {
-        console.error("Firebase init error:", e);
+        console.error("Firebase init/auth error:", e);
         handleFirebaseError(e);
       }
     }
@@ -1505,10 +1507,9 @@
     }
 
     function handleFirebaseError(err) {
-      console.warn("Firestore error intercepted:", err);
-      updateSyncStatusUI('error', 'Ошибка облака');
+      console.warn("Firestore exception:", err);
+      updateSyncStatusUI('error', 'Ошибка сети');
 
-      // Проверка на исчерпание лимитов бесплатного тарифа (Quota Exceeded / 429)
       if (
         err && (
           err.code === 'resource-exhausted' || 
@@ -1526,7 +1527,7 @@
     }
 
     function bindRealtimeVault(vaultId) {
-      if (!firestoreDb || !vaultId) return;
+      if (!firestoreDb || !vaultId || !currentAuthUser) return;
 
       if (unsubscribeSnapshot) {
         unsubscribeSnapshot();
@@ -1538,7 +1539,7 @@
       unsubscribeSnapshot = docRef.onSnapshot(
         (docSnap) => {
           if (!docSnap.exists) {
-            // Первый запуск хранилища: заливаем локальные данные в облако
+            // Первый запуск: создаем документ в облаке
             pushToCloudImmediately();
             updateSyncStatusUI('online', 'В сети');
             return;
@@ -1564,10 +1565,9 @@
       );
     }
 
-    // Дебаунс отправки: группирует частые клики ползунков в один запрос
     function triggerCloudSync() {
       saveLocalStorage();
-      if (!firestoreDb || isRemoteUpdateInProgress) return;
+      if (!firestoreDb || isRemoteUpdateInProgress || !currentAuthUser) return;
 
       const vaultId = localStorage.getItem(STORAGE_KEY_VAULT);
       if (!vaultId) return;
@@ -1576,17 +1576,18 @@
       clearTimeout(syncDebounceTimer);
       syncDebounceTimer = setTimeout(() => {
         pushToCloudImmediately();
-      }, 1200);
+      }, 1000);
     }
 
     function pushToCloudImmediately() {
       const vaultId = localStorage.getItem(STORAGE_KEY_VAULT);
-      if (!firestoreDb || !vaultId) return;
+      if (!firestoreDb || !vaultId || !currentAuthUser) return;
 
       const payload = {
         tasks: tasks,
         totalWins: settings.totalWins || 0,
-        lastUpdated: Date.now()
+        lastUpdated: Date.now(),
+        ownerUid: currentAuthUser.uid
       };
 
       firestoreDb.collection('dopafocus_vaults').doc(vaultId).set(payload, { merge: true })
@@ -1974,7 +1975,7 @@
         head.appendChild(actions);
         card.appendChild(head);
 
-        // Интерактивный ползунок
+        // Интерактивный ползунок прогресса
         const sliderBox = document.createElement('div');
         sliderBox.className = 'slider-interactive-box';
 
@@ -2015,7 +2016,7 @@
         sliderBox.appendChild(valuesRow);
         card.appendChild(sliderBox);
 
-        // Микро-шаги с белой галочкой
+        // Микро-шаги (белая галочка)
         const subBox = document.createElement('div');
         subBox.className = 'subtasks-wrapper';
 
@@ -2322,14 +2323,12 @@
         }
       });
 
-      // Бустер
       document.getElementById('btnCloseBooster').addEventListener('click', closeBooster);
       document.getElementById('btnToggleBooster').addEventListener('click', () => {
         isBoosterActive = !isBoosterActive;
         document.getElementById('btnToggleBooster').textContent = isBoosterActive ? 'Пауза' : 'Продолжить';
       });
 
-      // Донат
       const donateModal = document.getElementById('donateModal');
       document.getElementById('btnOpenDonate').addEventListener('click', () => {
         donateModal.style.display = 'flex';
@@ -2341,7 +2340,7 @@
         if (e.target === donateModal) donateModal.style.display = 'none';
       });
 
-      // Синхронизация и Облако
+      // Окно синхронизации
       const syncModal = document.getElementById('syncModal');
       const passDisplay = document.getElementById('syncPassphraseDisplay');
       const currentVault = localStorage.getItem(STORAGE_KEY_VAULT);
@@ -2349,8 +2348,6 @@
 
       document.getElementById('btnOpenSyncModal').addEventListener('click', () => {
         syncModal.style.display = 'flex';
-        const savedConfig = localStorage.getItem(STORAGE_KEY_FB_CONFIG);
-        if (savedConfig) document.getElementById('firebaseConfigInput').value = savedConfig;
       });
 
       document.getElementById('btnCloseSyncModal').addEventListener('click', () => {
@@ -2361,15 +2358,14 @@
         if (e.target === syncModal) syncModal.style.display = 'none';
       });
 
-      // Генерация нового ключа
+      // Генерация защищенного пароля (3 слова + 2 цифры + 2 буквы)
       document.getElementById('btnGenerateVaultKey').addEventListener('click', () => {
-        const newKey = generateRandomPassphrase();
+        const newKey = generateSecurePassphrase();
         localStorage.setItem(STORAGE_KEY_VAULT, newKey);
         passDisplay.textContent = newKey;
         bindRealtimeVault(newKey);
       });
 
-      // Копирование пароля
       document.getElementById('btnCopyPassphrase').addEventListener('click', () => {
         const key = passDisplay.textContent;
         if (key && key !== 'не создан') {
@@ -2378,7 +2374,6 @@
         }
       });
 
-      // Подключение по чужому паролю
       document.getElementById('btnConnectVault').addEventListener('click', () => {
         const inputKey = document.getElementById('inputConnectPassphrase').value.trim();
         if (inputKey) {
@@ -2390,20 +2385,6 @@
         }
       });
 
-      // Сохранение конфига Firebase
-      document.getElementById('btnSaveFirebaseConfig').addEventListener('click', () => {
-        const raw = document.getElementById('firebaseConfigInput').value.trim();
-        try {
-          JSON.parse(raw);
-          localStorage.setItem(STORAGE_KEY_FB_CONFIG, raw);
-          alert("Конфиг Firebase сохранён! Перезапускаем синхронизацию.");
-          initFirebase();
-        } catch (err) {
-          alert("Ошибка: проверьте валидность формата JSON!");
-        }
-      });
-
-      // Закрытие баннера квот
       document.getElementById('btnCloseQuotaBanner').addEventListener('click', () => {
         document.getElementById('quotaAlertBanner').style.display = 'none';
       });
