@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DopaFocus — Бережный трекер задач с СДВГ-фокусом</title>
   
-  <!-- Firebase SDK (v9 compat mode) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -166,7 +166,6 @@
       gap: 10px;
     }
 
-    /* Индикатор статуса синхронизации */
     .sync-status-btn {
       background: #fbf1e8;
       color: #9a3412;
@@ -245,7 +244,6 @@
       align-items: start;
     }
 
-    /* Левая колонка: Календарь */
     .calendar-container {
       background: var(--surface);
       border-radius: var(--radius-xl);
@@ -415,7 +413,6 @@
       opacity: 0.9;
     }
 
-    /* Правая колонка: Фокус-панель */
     .focus-sidebar {
       background: var(--surface);
       border-radius: var(--radius-xl);
@@ -486,6 +483,7 @@
       border: 1px dashed #fed7aa;
       border-radius: var(--radius-lg);
       padding: 14px;
+      position: relative;
     }
 
     .input-field {
@@ -501,6 +499,26 @@
 
     .input-field:focus {
       border-color: var(--primary);
+    }
+
+    .local-warning-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: #9a3412;
+      line-height: 1.4;
+    }
+
+    .local-warning-badge a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
     }
 
     .form-pills-container {
@@ -828,7 +846,7 @@
     .footer-left-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -899,7 +917,7 @@
       background: var(--surface);
       border-radius: var(--radius-xl);
       padding: 28px;
-      max-width: 480px;
+      max-width: 520px;
       width: 100%;
       text-align: left;
       box-shadow: var(--shadow-lg);
@@ -907,6 +925,8 @@
       flex-direction: column;
       gap: 16px;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .timer-readout {
@@ -918,7 +938,7 @@
       text-align: center;
     }
 
-    .sync-vault-box {
+    .sync-step-box {
       background: #fff7ed;
       border: 1.5px solid #fed7aa;
       border-radius: var(--radius-md);
@@ -940,6 +960,44 @@
       border: 1px solid #fed7aa;
       text-align: center;
       user-select: all;
+    }
+
+    .onboarding-option-card {
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .onboarding-option-card:hover {
+      border-color: var(--primary);
+      background: #fffbf7;
+      transform: translateY(-1px);
+    }
+
+    /* Блоки справки */
+    .help-section-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .help-icon-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: #fff7ed;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid #fed7aa;
     }
 
     #confettiCanvas {
@@ -1020,7 +1078,9 @@
           <a href="https://t.me/maxim_koles" target="_blank" rel="noopener noreferrer">@maxim_koles</a>, чтобы расширить тариф!
         </span>
       </div>
-      <button class="btn-icon" id="btnCloseQuotaBanner" style="padding: 4px 8px;">✕</button>
+      <button class="btn-icon" id="btnCloseQuotaBanner" style="padding: 4px 8px;">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
     </div>
 
     <!-- Шапка -->
@@ -1043,12 +1103,23 @@
       </div>
 
       <div class="header-actions">
+        <!-- Кнопка Инструкции (?) -->
+        <button class="btn-icon" id="btnOpenHelp" title="Как пользоваться приложением" style="border-radius: 50%; width: 38px; height: 38px; padding: 0;">
+          <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+
         <!-- Кнопка Синхронизации / Облака -->
-        <button class="sync-status-btn" id="btnOpenSyncModal" title="Настройка облачной синхронизации">
+        <button class="sync-status-btn" id="btnOpenSyncModal" title="Открыть настройки доступа с других устройств">
           <span class="sync-status-dot" id="syncStatusDot"></span>
-          <span id="syncStatusLabel">Синхронизация</span>
+          <span id="syncStatusLabel">Только здесь</span>
           <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
-            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+            <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
           </svg>
         </button>
 
@@ -1137,6 +1208,19 @@
             maxlength="90" 
             required 
           />
+
+          <!-- Человеческое предупреждение о локальном хранении -->
+          <div class="local-warning-badge" id="localWarningBadge">
+            <svg class="icon" style="width: 16px; height: 16px; flex-shrink: 0;" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>
+              Задачи сохраняются только на этом устройстве. 
+              <a id="linkWarnSync">Подключить телефон или компьютер</a>, чтобы не потерять их.
+            </span>
+          </div>
           
           <div class="form-pills-container">
             <div class="pill-selector-row" id="categoryPillGroup">
@@ -1186,11 +1270,25 @@
       <div class="footer-left-actions">
         <button class="btn-footer-link btn-footer-demo" id="btnLoadDemo" title="Заполнить примерами">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Добавить демо-данные
+          Демо-данные
         </button>
+        
+        <!-- Экспорт -->
+        <button class="btn-footer-link" id="btnExportJson" title="Сохранить файл на случай чистки браузера">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Экспорт в файл
+        </button>
+
+        <!-- Импорт -->
+        <button class="btn-footer-link" id="btnTriggerImport" title="Восстановить задачи из ранее сохранённого файла">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Импорт из файла
+        </button>
+        <input type="file" id="fileImportInput" accept=".json" style="display: none;" />
+
         <button class="btn-footer-link btn-footer-reset" id="btnResetAll">
           <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-          Сбросить данные
+          Сбросить всё
         </button>
       </div>
 
@@ -1210,6 +1308,93 @@
 
   </div>
 
+  <!-- Модальное окно: Краткая и понятная инструкция (?) -->
+  <div class="modal-overlay" id="helpModal" style="display: none;">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-soft); padding-bottom: 12px;">
+        <h3 style="font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+          <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          Как пользоваться DopaFocus
+        </h3>
+        <button class="btn-icon" id="btnCloseHelpModal" style="padding: 4px 8px;">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.88rem; color: var(--text-main); line-height: 1.45;">
+        
+        <div class="help-section-item">
+          <div class="help-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>
+          </div>
+          <div>
+            <b>1. Календарь-теплокарта (Слева)</b>
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
+              В каждом дне максимум 9 цветных кубиков по категориям. Выполненная задача становится серой с галочкой. Иконка в углу дня показывает общую загрузку: листик — легко (1–3), лимон — средняя норма (4–6), огонёк — плотный день (7–9).
+            </div>
+          </div>
+        </div>
+
+        <div class="help-section-item">
+          <div class="help-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <div>
+            <b>2. Быстрый старт на 5 минут</b>
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
+              Трудно начать объемное дело? Нажмите значок молнии на карточке задачи — запустится бережный таймер на 5 минут без ожиданий и требований к идеалу, чтобы снять ступор перед стартом.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-section-item">
+          <div class="help-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          </div>
+          <div>
+            <b>3. Дробилка на микро-шаги и прогресс</b>
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
+              Разбивайте дела на простые шаги (например: «открыть файл», «написать строку»). Каждая галочка синхронно двигает ползунок задачи, выдавая порцию дофамина.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-section-item">
+          <div class="help-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+          </div>
+          <div>
+            <b>4. Перенос без чувства вины («Завтра»)</b>
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
+              Не успели сегодня? Нажмите кнопку с двойной стрелкой — задача бесшовно переместится на следующий день без мигающих красных штрафов и упрёков.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-section-item">
+          <div class="help-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          </div>
+          <div>
+            <b>5. Синхронизация между устройствами</b>
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
+              Нажмите кнопку в шапке, скопируйте короткую фразу-ключ и вставьте её на втором устройстве. Всё синхронизируется в реальном времени.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+        <button class="btn-submit" id="btnCloseHelpBtn" style="padding: 8px 20px;">Всё понятно</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Модальное окно 5-минутного таймера -->
   <div class="modal-overlay" id="boosterModal" style="display: none;">
     <div class="modal-card">
@@ -1222,7 +1407,7 @@
       </div>
       <h3 id="boosterTitleText" style="text-align: center;">Фокус на 5 минут</h3>
       <p style="font-size: 0.88rem; color: var(--text-muted); text-align: center;">
-        Договорись с собой всего на 5 минут: просто начни без ожиданий и требований к идеалу. Барьер старта — самый сложный шаг!
+        Договоритесь с собой всего на 5 минут: просто откройте файл или напишите первую строчку. Без ожиданий и давления!
       </p>
       <div class="timer-readout" id="boosterTimerDigits">05:00</div>
       <div style="display: flex; gap: 10px; justify-content: center;">
@@ -1232,42 +1417,98 @@
     </div>
   </div>
 
-  <!-- Модальное окно Облака и Синхронизации -->
+  <!-- Модальное окно первого входа -->
+  <div class="modal-overlay" id="welcomeModal" style="display: none;">
+    <div class="modal-card">
+      <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
+        <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m12 8 4 4-4 4M8 12h8"></path></svg>
+        Добро пожаловать в DopaFocus!
+      </h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.45;" id="welcomeDeviceSubtitle">
+        Чтобы расписание было всегда под рукой, вы можете связать телефон и компьютер.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+        <div class="onboarding-option-card" id="btnOnboardConnectExisting">
+          <div class="brand-logo-badge" style="width: 38px; height: 38px; background: #e0f2fe; color: #0284c7;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.92rem;" id="onboardOptionConnectTitle">У меня уже открыт трекер на другом устройстве</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Ввести короткую фразу-ключ и загрузить свой план</div>
+          </div>
+        </div>
+
+        <div class="onboarding-option-card" id="btnOnboardCreateNew">
+          <div class="brand-logo-badge" style="width: 38px; height: 38px; background: #fef3c7; color: #d97706;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.92rem;">Это моё первое устройство — создать расписание</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Получить фразу-ключ, чтобы легко открыть эти же задачи на втором экране</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+        <button class="btn-footer-link" id="btnSkipOnboarding" style="font-size: 0.82rem; color: var(--text-dim);">
+          Я пока просто посмотрю трекер без синхронизации →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно синхронизации -->
   <div class="modal-overlay" id="syncModal" style="display: none;">
     <div class="modal-card">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h3 style="font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
           <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24">
-            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+            <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
           </svg>
-          Синхронизация в реальном времени
+          Как пользоваться с телефона и компьютера
         </h3>
-        <button class="btn-icon" id="btnCloseSyncModal" style="padding: 4px 8px;">✕</button>
+        <button class="btn-icon" id="btnCloseSyncModal" style="padding: 4px 8px;">
+          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
-      <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;">
-        Подключите телефон и ноутбук с помощью волшебного пароля. Всё синхронизируется мгновенно и без логинов!
+      <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+        Вам не нужно регистрироваться или вводить почту. Всё работает через одну <b>фразу-ключ</b>:
       </p>
 
-      <!-- Блок магического пароля -->
-      <div class="sync-vault-box">
-        <div style="font-size: 0.82rem; font-weight: 600; color: #9a3412;">Твой волшебный пароль синхронизации:</div>
-        <div class="sync-passphrase" id="syncPassphraseDisplay">не создан</div>
+      <div class="sync-step-box">
+        <div style="font-size: 0.82rem; font-weight: 700; color: #9a3412;">
+          ШАГ 1. Ваша персональная фраза-ключ:
+        </div>
+        <div class="sync-passphrase" id="syncPassphraseDisplay">не создана</div>
+        <div style="font-size: 0.76rem; color: #78716c;">
+          Любое действие здесь автоматически сохраняется в облаке под этой фразой.
+        </div>
         <div style="display: flex; gap: 8px; margin-top: 4px;">
-          <button class="btn-submit" id="btnGenerateVaultKey" style="flex: 1; padding: 7px 10px; font-size: 0.82rem;">Сгенерировать новый</button>
-          <button class="btn-icon" id="btnCopyPassphrase" style="padding: 7px 12px;" title="Скопировать пароль">
+          <button class="btn-submit" id="btnGenerateVaultKey" style="flex: 1; padding: 7px 10px; font-size: 0.82rem;">
+            Сгенерировать новую фразу
+          </button>
+          <button class="btn-icon" id="btnCopyPassphrase" style="padding: 7px 12px;" title="Скопировать фразу">
             <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
           </button>
         </div>
       </div>
 
-      <!-- Ввод чужого пароля -->
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">Или введите пароль со второго устройства:</label>
+      <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-soft); padding-top: 12px;">
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+          ШАГ 2. Открыли трекер на втором устройстве?
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          Просто вставьте сюда фразу из Шага 1. Ваши задачи появятся сразу на обоих экранах:
+        </div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="inputConnectPassphrase" class="input-field" placeholder="например: луна-маяк-персик-42ab" style="font-family: monospace;" />
-          <button class="btn-submit" id="btnConnectVault" style="padding: 8px 14px;">Связать</button>
+          <button class="btn-submit" id="btnConnectVault" style="padding: 8px 14px; white-space: nowrap;">Подключить</button>
         </div>
+        <div id="syncErrorMessage" style="display: none; color: #dc2626; font-size: 0.78rem;"></div>
       </div>
     </div>
   </div>
@@ -1282,12 +1523,12 @@
         Спасибо за поддержку!
       </h3>
       <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;">
-        Приложение спроектировано и создано с заботой о людях с СДВГ, чтобы снизить уровень стресса и помочь мозгу получать заслуженный дофамин.
+        Приложение создано с заботой о людях с СДВГ, чтобы снизить тревожность от дел и дать мозгу заслуженный дофамин.
       </p>
       
       <div>
         <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Разработчик:</div>
-        <a href="https://t.me/maxim_koles" target="_blank" rel="noopener noreferrer" class="author-badge">
+        <a href="https://t.me/maxim_koles" target="_blank" rel="noopener noreferrer" class="author-badge" style="display: inline-flex; align-items: center; gap: 6px; background: #eff6ff; color: #2563eb; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.9rem; text-decoration: none; border: 1px solid #bfdbfe; margin: 6px 0;">
           <svg class="icon" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>
           @maxim_koles (Telegram)
         </a>
@@ -1296,7 +1537,7 @@
       <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 6px;">
         <div style="font-size: 0.82rem; font-weight: 600; color: #9a3412;">Реквизиты для перевода (Т-Банк):</div>
         <div style="font-family: monospace; font-size: 1.15rem; font-weight: 700; color: #9a3412; letter-spacing: 0.5px;">89001223308</div>
-        <div style="font-size: 0.78rem; color: #c2410c;">Любая сумма на кофе автору помогает развивать проект ☕</div>
+        <div style="font-size: 0.78rem; color: #c2410c;">Любая сумма на кофе автору помогает проекту развиваться.</div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
@@ -1307,7 +1548,7 @@
 
   <script>
     /* ==========================================================
-       ВШИТЫЙ FIREBASE CONFIG И АВТОРИЗАЦИЯ
+       КОНФИГУРАЦИЯ FIREBASE
        ========================================================== */
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyCxWCkKPD-giEPSnPO6Sp-Xm_CDmicQubA",
@@ -1318,16 +1559,17 @@
       appId: "1:1096725760339:web:04ed63af8a492809ae79a6"
     };
 
-    const STORAGE_KEY_TASKS = 'dopafocus_tasks_v8';
-    const STORAGE_KEY_SETTINGS = 'dopafocus_settings_v8';
+    const STORAGE_KEY_TASKS = 'dopafocus_tasks_v9';
+    const STORAGE_KEY_SETTINGS = 'dopafocus_settings_v9';
     const STORAGE_KEY_VAULT = 'dopafocus_vault_id';
+    const STORAGE_KEY_SEEN_ONBOARD = 'dopafocus_seen_onboard_v2';
 
     const MOTIVATIONAL_QUOTES = [
       "«Даже самое маленькое действие — это победа над параличом старта. Ты молодец!»",
-      "«СДВГ-мозг жаждет дофамина. Закрой микро-шаг и почувствуй удовлетворение ✨»",
+      "«СДВГ-мозг жаждет дофамина. Закрой микро-шаг и почувствуй удовлетворение!»",
       "«Перенос дел на завтра — это взрослое управление ресурсом, а не слабость.»",
       "«Если уровень сил на нуле — выбери задачу со значком рутины и отпусти перфекционизм.»",
-      "«Каждый серый кубик с галочкой — ощутимое свидетельство твоих усилий 🌿»",
+      "«Каждый серый кубик с галочкой — ощутимое свидетельство твоих усилий.»",
       "«5 минут фокуса снимают главный страх. Сделай первый шаг прямо сейчас!»"
     ];
 
@@ -1354,7 +1596,6 @@
     let boosterTimerId = null;
     let isBoosterActive = false;
 
-    // Firebase state
     let firestoreDb = null;
     let currentAuthUser = null;
     let unsubscribeSnapshot = null;
@@ -1436,7 +1677,6 @@
       return d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
-    // 3 слова + 2 цифры + 2 буквы (высокая энтропия)
     function generateSecurePassphrase() {
       const w1 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
       const w2 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
@@ -1467,8 +1707,19 @@
         settings.lastUpdated = Date.now();
         localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
         localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+        checkLocalWarningBadge();
       } catch (e) {
         console.error("Local storage save error:", e);
+      }
+    }
+
+    function checkLocalWarningBadge() {
+      const hasVault = localStorage.getItem(STORAGE_KEY_VAULT);
+      const warnBadge = document.getElementById('localWarningBadge');
+      if (!hasVault) {
+        warnBadge.style.display = 'flex';
+      } else {
+        warnBadge.style.display = 'none';
       }
     }
 
@@ -1482,16 +1733,15 @@
         }
         firestoreDb = firebase.firestore();
 
-        // Фоновая анонимная авторизация
         const authResult = await firebase.auth().signInAnonymously();
         currentAuthUser = authResult.user;
 
-        // Если у пользователя уже есть сохраненный пароль — подключаем слушатель
         const vaultId = localStorage.getItem(STORAGE_KEY_VAULT);
         if (vaultId) {
           bindRealtimeVault(vaultId);
         } else {
-          updateSyncStatusUI('offline', 'Локально');
+          updateSyncStatusUI('offline', 'Только здесь');
+          checkFirstTimeOnboarding();
         }
       } catch (e) {
         console.error("Firebase init/auth error:", e);
@@ -1504,6 +1754,7 @@
       const label = document.getElementById('syncStatusLabel');
       dot.className = `sync-status-dot ${status}`;
       label.textContent = text;
+      checkLocalWarningBadge();
     }
 
     function handleFirebaseError(err) {
@@ -1539,9 +1790,8 @@
       unsubscribeSnapshot = docRef.onSnapshot(
         (docSnap) => {
           if (!docSnap.exists) {
-            // Первый запуск: создаем документ в облаке
             pushToCloudImmediately();
-            updateSyncStatusUI('online', 'В сети');
+            updateSyncStatusUI('online', 'Связано');
             return;
           }
 
@@ -1557,7 +1807,7 @@
             renderAll();
             isRemoteUpdateInProgress = false;
           }
-          updateSyncStatusUI('online', 'В сети');
+          updateSyncStatusUI('online', 'Связано');
         },
         (error) => {
           handleFirebaseError(error);
@@ -1592,11 +1842,35 @@
 
       firestoreDb.collection('dopafocus_vaults').doc(vaultId).set(payload, { merge: true })
         .then(() => {
-          updateSyncStatusUI('online', 'В сети');
+          updateSyncStatusUI('online', 'Связано');
         })
         .catch((err) => {
           handleFirebaseError(err);
         });
+    }
+
+    /* ==========================================================
+       ОНБОРДИНГ
+       ========================================================== */
+    function checkFirstTimeOnboarding() {
+      const alreadySeen = localStorage.getItem(STORAGE_KEY_SEEN_ONBOARD);
+      const hasVault = localStorage.getItem(STORAGE_KEY_VAULT);
+
+      if (!alreadySeen && !hasVault) {
+        const isMobile = window.innerWidth <= 640 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const sub = document.getElementById('welcomeDeviceSubtitle');
+        const optTitle = document.getElementById('onboardOptionConnectTitle');
+
+        if (isMobile) {
+          sub.textContent = "Вы открыли трекер на телефоне. Если вы уже ведёте план на компьютере — введите фразу-ключ, чтобы все задачи появились здесь:";
+          optTitle.textContent = "Ввести фразу-ключ с компьютера";
+        } else {
+          sub.textContent = "Вы открыли трекер на компьютере. Рекомендуем создать фразу-ключ, чтобы это же расписание открывалось и на вашем телефоне!";
+          optTitle.textContent = "У меня уже есть ключ со смартфона";
+        }
+
+        document.getElementById('welcomeModal').style.display = 'flex';
+      }
     }
 
     /* ==========================================================
@@ -1668,7 +1942,7 @@
     }
 
     /* ==========================================================
-       ДОФАМИН: АНИМАЦИИ И СПАРКЛЫ
+       ДОФАМИН: АНИМАЦИИ
        ========================================================== */
     const canvas = document.getElementById('confettiCanvas');
     const ctx = canvas.getContext('2d');
@@ -1909,7 +2183,7 @@
       if (dayTasks.length === 0) {
         listContainer.innerHTML = `
           <div style="text-align: center; color: var(--text-dim); padding: 40px 10px; font-size: 0.9rem;">
-            День полностью свободен.<br>Добавьте задачу выше или позвольте себе перевести дух 🌿
+            День полностью свободен.<br>Добавьте задачу выше или позвольте себе перевести дух 
           </div>
         `;
         return;
@@ -1975,7 +2249,6 @@
         head.appendChild(actions);
         card.appendChild(head);
 
-        // Интерактивный ползунок прогресса
         const sliderBox = document.createElement('div');
         sliderBox.className = 'slider-interactive-box';
 
@@ -2016,7 +2289,6 @@
         sliderBox.appendChild(valuesRow);
         card.appendChild(sliderBox);
 
-        // Микро-шаги (белая галочка)
         const subBox = document.createElement('div');
         subBox.className = 'subtasks-wrapper';
 
@@ -2104,7 +2376,7 @@
     function addTask(title, category, energy) {
       const currentDayTasks = tasks.filter(t => t.date === selectedDateString);
       if (currentDayTasks.length >= 9) {
-        alert("В ячейке дня помещается максимум 9 кубиков. Это бережный защитный лимит от перегруза 🌿");
+        alert("В ячейке дня помещается максимум 9 кубиков. Это бережный защитный лимит от перегруза.");
         return;
       }
 
@@ -2229,7 +2501,7 @@
         if (boosterSeconds <= 0) {
           clearInterval(boosterTimerId);
           fireConfetti();
-          alert("5 минут фокуса позади! Ты успешно преодолел барьер старта 🌿");
+          alert("5 минут фокуса позади! Ты успешно преодолел барьер старта.");
           closeBooster();
         }
       }, 1000);
@@ -2248,12 +2520,76 @@
     }
 
     /* ==========================================================
+       ЭКСПОРТ И ИМПОРТ РЕЗЕРВНОЙ КОПИИ
+       ========================================================== */
+    function exportBackupFile() {
+      const backupData = {
+        app: "DopaFocus",
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        vaultId: localStorage.getItem(STORAGE_KEY_VAULT) || null,
+        settings: settings,
+        tasks: tasks
+      };
+
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dopafocus-backup-${formatDateToKey(new Date())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleImportFile(file) {
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed.tasks || !Array.isArray(parsed.tasks)) {
+            alert("Ошибка: файл не содержит корректных задач DopaFocus.");
+            return;
+          }
+
+          const confirmImport = confirm(`Найдено ${parsed.tasks.length} задач. Загрузить резервную копию и объединить с текущим планом?`);
+          if (!confirmImport) return;
+
+          // Объединяем задачи без дублей по ID
+          const existingIds = new Set(tasks.map(t => t.id));
+          parsed.tasks.forEach(t => {
+            if (!existingIds.has(t.id)) {
+              tasks.push(t);
+            }
+          });
+
+          if (parsed.settings && typeof parsed.settings.totalWins === 'number') {
+            settings.totalWins = Math.max(settings.totalWins || 0, parsed.settings.totalWins);
+          }
+
+          triggerCloudSync();
+          renderAll();
+          fireConfetti();
+          alert("Резервная копия успешно загружена!");
+        } catch (err) {
+          console.error("Import error:", err);
+          alert("Не удалось прочитать файл. Убедитесь, что это правильный .json бэкап.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ==========================================================
        СЛУШАТЕЛИ И ИНИЦИАЛИЗАЦИЯ
        ========================================================== */
     function renderAll() {
       document.getElementById('totalWinsCount').textContent = settings.totalWins || 0;
       renderCalendar();
       renderSidebar();
+      checkLocalWarningBadge();
     }
 
     function initFormPills() {
@@ -2311,9 +2647,22 @@
       });
 
       document.getElementById('btnLoadDemo').addEventListener('click', loadDemoData);
+      document.getElementById('btnExportJson').addEventListener('click', exportBackupFile);
+
+      // Обработка кнопки и скрытого инпута Импорта
+      const fileInput = document.getElementById('fileImportInput');
+      document.getElementById('btnTriggerImport').addEventListener('click', () => {
+        fileInput.value = '';
+        fileInput.click();
+      });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleImportFile(e.target.files[0]);
+        }
+      });
 
       document.getElementById('btnResetAll').addEventListener('click', () => {
-        if (confirm("Точно удалить все данные? Это очистит задачи и сбросит счетчик побед.")) {
+        if (confirm("Точно очистить все задачи? Это удалит список дел на этом экране.")) {
           localStorage.removeItem(STORAGE_KEY_TASKS);
           localStorage.removeItem(STORAGE_KEY_SETTINGS);
           tasks = [];
@@ -2323,12 +2672,29 @@
         }
       });
 
+      // Бустер
       document.getElementById('btnCloseBooster').addEventListener('click', closeBooster);
       document.getElementById('btnToggleBooster').addEventListener('click', () => {
         isBoosterActive = !isBoosterActive;
         document.getElementById('btnToggleBooster').textContent = isBoosterActive ? 'Пауза' : 'Продолжить';
       });
 
+      // Модалка справки (?)
+      const helpModal = document.getElementById('helpModal');
+      document.getElementById('btnOpenHelp').addEventListener('click', () => {
+        helpModal.style.display = 'flex';
+      });
+      document.getElementById('btnCloseHelpModal').addEventListener('click', () => {
+        helpModal.style.display = 'none';
+      });
+      document.getElementById('btnCloseHelpBtn').addEventListener('click', () => {
+        helpModal.style.display = 'none';
+      });
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) helpModal.style.display = 'none';
+      });
+
+      // Донат
       const donateModal = document.getElementById('donateModal');
       document.getElementById('btnOpenDonate').addEventListener('click', () => {
         donateModal.style.display = 'flex';
@@ -2340,15 +2706,19 @@
         if (e.target === donateModal) donateModal.style.display = 'none';
       });
 
-      // Окно синхронизации
+      // Синхронизация
       const syncModal = document.getElementById('syncModal');
       const passDisplay = document.getElementById('syncPassphraseDisplay');
       const currentVault = localStorage.getItem(STORAGE_KEY_VAULT);
       if (currentVault) passDisplay.textContent = currentVault;
 
-      document.getElementById('btnOpenSyncModal').addEventListener('click', () => {
+      const openSyncModalFn = () => {
+        document.getElementById('syncErrorMessage').style.display = 'none';
         syncModal.style.display = 'flex';
-      });
+      };
+
+      document.getElementById('btnOpenSyncModal').addEventListener('click', openSyncModalFn);
+      document.getElementById('linkWarnSync').addEventListener('click', openSyncModalFn);
 
       document.getElementById('btnCloseSyncModal').addEventListener('click', () => {
         syncModal.style.display = 'none';
@@ -2358,35 +2728,97 @@
         if (e.target === syncModal) syncModal.style.display = 'none';
       });
 
-      // Генерация защищенного пароля (3 слова + 2 цифры + 2 буквы)
+      // Генерация фразы
       document.getElementById('btnGenerateVaultKey').addEventListener('click', () => {
         const newKey = generateSecurePassphrase();
         localStorage.setItem(STORAGE_KEY_VAULT, newKey);
         passDisplay.textContent = newKey;
         bindRealtimeVault(newKey);
+        checkLocalWarningBadge();
       });
 
       document.getElementById('btnCopyPassphrase').addEventListener('click', () => {
         const key = passDisplay.textContent;
-        if (key && key !== 'не создан') {
+        if (key && key !== 'не создана') {
           navigator.clipboard.writeText(key);
-          alert(`Пароль скопирован: ${key}`);
+          alert(`Фраза скопирована: ${key}\n\nТеперь откройте DopaFocus на втором устройстве и вставьте её во втором пункте.`);
         }
       });
 
-      document.getElementById('btnConnectVault').addEventListener('click', () => {
-        const inputKey = document.getElementById('inputConnectPassphrase').value.trim();
-        if (inputKey) {
-          localStorage.setItem(STORAGE_KEY_VAULT, inputKey);
-          passDisplay.textContent = inputKey;
-          bindRealtimeVault(inputKey);
-          alert(`Успешно связано с хранилищем: ${inputKey}`);
-          syncModal.style.display = 'none';
+      // Подключение по фразе со второго устройства
+      document.getElementById('btnConnectVault').addEventListener('click', async () => {
+        const errEl = document.getElementById('syncErrorMessage');
+        errEl.style.display = 'none';
+
+        let inputKey = document.getElementById('inputConnectPassphrase').value.trim().toLowerCase();
+        inputKey = inputKey.replace(/\s+/g, '');
+
+        if (!inputKey) {
+          errEl.textContent = "Пожалуйста, введите фразу-ключ!";
+          errEl.style.display = 'block';
+          return;
         }
+
+        if (firestoreDb) {
+          try {
+            const checkSnap = await firestoreDb.collection('dopafocus_vaults').doc(inputKey).get();
+            if (!checkSnap.exists) {
+              errEl.textContent = "Расписание с такой фразой не найдено. Проверьте правильность написания слов и букв.";
+              errEl.style.display = 'block';
+              return;
+            }
+
+            if (tasks.length > 0) {
+              const proceed = confirm("Подключить расписание с другого устройства? Текущие задачи на этом экране заменятся на задачи из общего плана.");
+              if (!proceed) return;
+            }
+
+            localStorage.setItem(STORAGE_KEY_VAULT, inputKey);
+            passDisplay.textContent = inputKey;
+            bindRealtimeVault(inputKey);
+            checkLocalWarningBadge();
+            alert(`Успешно! Теперь этот экран связан с общим расписанием: ${inputKey}`);
+            syncModal.style.display = 'none';
+          } catch (e) {
+            handleFirebaseError(e);
+            errEl.textContent = "Не удалось связаться с базой. Проверьте интернет-соединение.";
+            errEl.style.display = 'block';
+          }
+        }
+      });
+
+      // Онбординг
+      const welcomeModal = document.getElementById('welcomeModal');
+      const closeWelcome = () => {
+        localStorage.setItem(STORAGE_KEY_SEEN_ONBOARD, 'true');
+        welcomeModal.style.display = 'none';
+      };
+
+      document.getElementById('btnSkipOnboarding').addEventListener('click', closeWelcome);
+
+      document.getElementById('btnOnboardCreateNew').addEventListener('click', () => {
+        closeWelcome();
+        document.getElementById('btnGenerateVaultKey').click();
+        openSyncModalFn();
+      });
+
+      document.getElementById('btnOnboardConnectExisting').addEventListener('click', () => {
+        closeWelcome();
+        openSyncModalFn();
+        document.getElementById('inputConnectPassphrase').focus();
       });
 
       document.getElementById('btnCloseQuotaBanner').addEventListener('click', () => {
         document.getElementById('quotaAlertBanner').style.display = 'none';
+      });
+
+      window.addEventListener('online', () => {
+        const vaultId = localStorage.getItem(STORAGE_KEY_VAULT);
+        if (vaultId) bindRealtimeVault(vaultId);
+      });
+
+      window.addEventListener('offline', () => {
+        updateSyncStatusUI('offline', 'Офлайн');
       });
     }
 
