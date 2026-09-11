@@ -426,6 +426,7 @@
       gap: 20px;
       max-height: calc(100vh - 48px);
       overflow-y: auto;
+      scroll-margin-top: 20px;
     }
 
     .sidebar-header {
@@ -965,7 +966,7 @@
     .onboarding-option-card {
       border: 1.5px solid var(--border-soft);
       border-radius: var(--radius-lg);
-      padding: 14px;
+      padding: 16px 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1184,7 +1185,7 @@
       </section>
 
       <!-- Справа: Фокус-панель дня -->
-      <aside class="focus-sidebar">
+      <aside class="focus-sidebar" id="focusSidebar">
         <div class="sidebar-header">
           <h3 id="sidebarDayDate">План на день</h3>
           
@@ -1417,42 +1418,36 @@
     </div>
   </div>
 
-  <!-- Модальное окно первого входа -->
+  <!-- Приветственное окно (СДВГ-френдли, лаконичное) -->
   <div class="modal-overlay" id="welcomeModal" style="display: none;">
     <div class="modal-card">
       <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
         <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m12 8 4 4-4 4M8 12h8"></path></svg>
         Добро пожаловать в DopaFocus!
       </h3>
-      <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.45;" id="welcomeDeviceSubtitle">
-        Чтобы расписание было всегда под рукой, вы можете связать телефон и компьютер.
+      <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.45;">
+        Чтобы записи синхронизировались между телефоном и компьютером, достаточно связать их ключом:
       </p>
 
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
         <div class="onboarding-option-card" id="btnOnboardConnectExisting">
-          <div class="brand-logo-badge" style="width: 38px; height: 38px; background: #e0f2fe; color: #0284c7;">
+          <div class="brand-logo-badge" style="width: 38px; height: 38px; background: #e0f2fe; color: #0284c7; flex-shrink: 0;">
             <svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
           </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;" id="onboardOptionConnectTitle">У меня уже открыт трекер на другом устройстве</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted);">Ввести короткую фразу-ключ и загрузить свой план</div>
-          </div>
+          <div style="font-weight: 700; font-size: 0.95rem;">У меня уже есть ключ</div>
         </div>
 
         <div class="onboarding-option-card" id="btnOnboardCreateNew">
-          <div class="brand-logo-badge" style="width: 38px; height: 38px; background: #fef3c7; color: #d97706;">
+          <div class="brand-logo-badge" style="width: 38px; height: 38px; background: #fef3c7; color: #d97706; flex-shrink: 0;">
             <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
           </div>
-          <div>
-            <div style="font-weight: 700; font-size: 0.92rem;">Это моё первое устройство — создать расписание</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted);">Получить фразу-ключ, чтобы легко открыть эти же задачи на втором экране</div>
-          </div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Это моё первое устройство — создать ключ</div>
         </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
         <button class="btn-footer-link" id="btnSkipOnboarding" style="font-size: 0.82rem; color: var(--text-dim);">
-          Я пока просто посмотрю трекер без синхронизации →
+          Продолжить без синхронизации →
         </button>
       </div>
     </div>
@@ -1468,47 +1463,45 @@
             <line x1="8" y1="21" x2="16" y2="21"></line>
             <line x1="12" y1="17" x2="12" y2="21"></line>
           </svg>
-          Как пользоваться с телефона и компьютера
+          Синхронизация устройств
         </h3>
         <button class="btn-icon" id="btnCloseSyncModal" style="padding: 4px 8px;">
           <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
-      <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
-        Вам не нужно регистрироваться или вводить почту. Всё работает через одну <b>фразу-ключ</b>:
-      </p>
-
-      <div class="sync-step-box">
-        <div style="font-size: 0.82rem; font-weight: 700; color: #9a3412;">
-          ШАГ 1. Ваша персональная фраза-ключ:
+      <!-- Блок ввода ключа (если уже есть ключ) -->
+      <div id="sectionConnectKey" style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 0.84rem; font-weight: 700; color: var(--text-main);">
+          Ввести ключ с другого устройства:
         </div>
-        <div class="sync-passphrase" id="syncPassphraseDisplay">не создана</div>
-        <div style="font-size: 0.76rem; color: #78716c;">
-          Любое действие здесь автоматически сохраняется в облаке под этой фразой.
-        </div>
-        <div style="display: flex; gap: 8px; margin-top: 4px;">
-          <button class="btn-submit" id="btnGenerateVaultKey" style="flex: 1; padding: 7px 10px; font-size: 0.82rem;">
-            Сгенерировать новую фразу
-          </button>
-          <button class="btn-icon" id="btnCopyPassphrase" style="padding: 7px 12px;" title="Скопировать фразу">
-            <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
-          </button>
-        </div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-soft); padding-top: 12px;">
-        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
-          ШАГ 2. Открыли трекер на втором устройстве?
-        </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted);">
-          Просто вставьте сюда фразу из Шага 1. Ваши задачи появятся сразу на обоих экранах:
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+          Вставьте ключ, который был создан на первом устройстве. Ваши задачи сразу появятся на этом экране:
         </div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="inputConnectPassphrase" class="input-field" placeholder="например: луна-маяк-персик-42ab" style="font-family: monospace;" />
           <button class="btn-submit" id="btnConnectVault" style="padding: 8px 14px; white-space: nowrap;">Подключить</button>
         </div>
         <div id="syncErrorMessage" style="display: none; color: #dc2626; font-size: 0.78rem;"></div>
+      </div>
+
+      <!-- Блок созданного ключа (если создали ключ) -->
+      <div id="sectionCurrentKey" class="sync-step-box" style="margin-top: 4px;">
+        <div style="font-size: 0.84rem; font-weight: 700; color: #9a3412;" id="currentKeySectionTitle">
+          Ваш ключ для подключения:
+        </div>
+        <div class="sync-passphrase" id="syncPassphraseDisplay">не создана</div>
+        <div style="font-size: 0.78rem; color: #78716c; line-height: 1.4;" id="currentKeySectionDesc">
+          Откройте DopaFocus на втором устройстве, нажмите «У меня уже есть ключ» и вставьте эту фразу. Задачи свяжутся автоматически.
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button class="btn-submit" id="btnGenerateVaultKey" style="flex: 1; padding: 7px 10px; font-size: 0.82rem;">
+            Сгенерировать новый ключ
+          </button>
+          <button class="btn-icon" id="btnCopyPassphrase" style="padding: 7px 12px;" title="Скопировать ключ">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1857,18 +1850,6 @@
       const hasVault = localStorage.getItem(STORAGE_KEY_VAULT);
 
       if (!alreadySeen && !hasVault) {
-        const isMobile = window.innerWidth <= 640 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        const sub = document.getElementById('welcomeDeviceSubtitle');
-        const optTitle = document.getElementById('onboardOptionConnectTitle');
-
-        if (isMobile) {
-          sub.textContent = "Вы открыли трекер на телефоне. Если вы уже ведёте план на компьютере — введите фразу-ключ, чтобы все задачи появились здесь:";
-          optTitle.textContent = "Ввести фразу-ключ с компьютера";
-        } else {
-          sub.textContent = "Вы открыли трекер на компьютере. Рекомендуем создать фразу-ключ, чтобы это же расписание открывалось и на вашем телефоне!";
-          optTitle.textContent = "У меня уже есть ключ со смартфона";
-        }
-
         document.getElementById('welcomeModal').style.display = 'flex';
       }
     }
@@ -2137,6 +2118,14 @@
           selectedDateString = dateKey;
           renderCalendar();
           renderSidebar();
+
+          // 1. ПЛАВНЫЙ СКРОЛЛ НА МОБИЛЬНЫХ К ЗАДАЧАМ
+          if (window.innerWidth <= 1024) {
+            const sidebar = document.getElementById('focusSidebar');
+            if (sidebar) {
+              sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
         });
 
         calGrid.appendChild(card);
@@ -2558,7 +2547,6 @@
           const confirmImport = confirm(`Найдено ${parsed.tasks.length} задач. Загрузить резервную копию и объединить с текущим планом?`);
           if (!confirmImport) return;
 
-          // Объединяем задачи без дублей по ID
           const existingIds = new Set(tasks.map(t => t.id));
           parsed.tasks.forEach(t => {
             if (!existingIds.has(t.id)) {
@@ -2649,7 +2637,6 @@
       document.getElementById('btnLoadDemo').addEventListener('click', loadDemoData);
       document.getElementById('btnExportJson').addEventListener('click', exportBackupFile);
 
-      // Обработка кнопки и скрытого инпута Импорта
       const fileInput = document.getElementById('fileImportInput');
       document.getElementById('btnTriggerImport').addEventListener('click', () => {
         fileInput.value = '';
@@ -2709,16 +2696,31 @@
       // Синхронизация
       const syncModal = document.getElementById('syncModal');
       const passDisplay = document.getElementById('syncPassphraseDisplay');
-      const currentVault = localStorage.getItem(STORAGE_KEY_VAULT);
-      if (currentVault) passDisplay.textContent = currentVault;
+      const sectionConnect = document.getElementById('sectionConnectKey');
+      const sectionCurrent = document.getElementById('sectionCurrentKey');
 
-      const openSyncModalFn = () => {
+      const openSyncModalFn = (mode = 'all') => {
         document.getElementById('syncErrorMessage').style.display = 'none';
+        const currentVault = localStorage.getItem(STORAGE_KEY_VAULT);
+        if (currentVault) passDisplay.textContent = currentVault;
+
+        if (mode === 'connect') {
+          sectionConnect.style.display = 'flex';
+          sectionCurrent.style.display = 'none';
+          setTimeout(() => document.getElementById('inputConnectPassphrase').focus(), 50);
+        } else if (mode === 'create') {
+          sectionConnect.style.display = 'none';
+          sectionCurrent.style.display = 'flex';
+        } else {
+          sectionConnect.style.display = 'flex';
+          sectionCurrent.style.display = 'flex';
+        }
+
         syncModal.style.display = 'flex';
       };
 
-      document.getElementById('btnOpenSyncModal').addEventListener('click', openSyncModalFn);
-      document.getElementById('linkWarnSync').addEventListener('click', openSyncModalFn);
+      document.getElementById('btnOpenSyncModal').addEventListener('click', () => openSyncModalFn('all'));
+      document.getElementById('linkWarnSync').addEventListener('click', () => openSyncModalFn('all'));
 
       document.getElementById('btnCloseSyncModal').addEventListener('click', () => {
         syncModal.style.display = 'none';
@@ -2787,7 +2789,7 @@
         }
       });
 
-      // Онбординг
+      // Онбординг (СДВГ-френдли сценарии)
       const welcomeModal = document.getElementById('welcomeModal');
       const closeWelcome = () => {
         localStorage.setItem(STORAGE_KEY_SEEN_ONBOARD, 'true');
@@ -2796,16 +2798,17 @@
 
       document.getElementById('btnSkipOnboarding').addEventListener('click', closeWelcome);
 
+      // Вариант 1: Есть ключ -> открываем только поле ввода
+      document.getElementById('btnOnboardConnectExisting').addEventListener('click', () => {
+        closeWelcome();
+        openSyncModalFn('connect');
+      });
+
+      // Вариант 2: Создать ключ -> сразу генерируем и показываем только его с пояснением
       document.getElementById('btnOnboardCreateNew').addEventListener('click', () => {
         closeWelcome();
         document.getElementById('btnGenerateVaultKey').click();
-        openSyncModalFn();
-      });
-
-      document.getElementById('btnOnboardConnectExisting').addEventListener('click', () => {
-        closeWelcome();
-        openSyncModalFn();
-        document.getElementById('inputConnectPassphrase').focus();
+        openSyncModalFn('create');
       });
 
       document.getElementById('btnCloseQuotaBanner').addEventListener('click', () => {
