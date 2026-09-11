@@ -48,6 +48,33 @@
       --radius-sm: 8px;
     }
 
+    /* Тёмная тема */
+    body.dark-mode {
+      --bg-canvas: #1c1917;
+      --surface: #292524;
+      --surface-subtle: #302c29;
+      --border-soft: #44403c;
+      --border-focus: #57534e;
+      
+      --text-main: #f5f5f4;
+      --text-muted: #a8a29e;
+      --text-dim: #78716c;
+
+      --primary-light: #431407;
+      --primary-gradient: linear-gradient(135deg, #ea580c, #e11d48);
+
+      --cat-study-bg: #232247;
+      --cat-work-bg: #3b172a;
+      --cat-home-bg: #281c40;
+      --cat-rest-bg: #0f3426;
+
+      --cube-done: #57534e;
+
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -65,6 +92,7 @@
       align-items: center;
       padding: 24px;
       position: relative;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     .app-viewport {
@@ -90,7 +118,6 @@
       flex-shrink: 0;
     }
 
-    /* Предупреждающий баннер при перегрузке базы */
     .quota-banner {
       display: none;
       background: #fff7ed;
@@ -106,6 +133,12 @@
       animation: alertPulse 2s infinite ease-in-out;
     }
 
+    body.dark-mode .quota-banner {
+      background: #3c1e11;
+      border-color: #9a3412;
+      color: #fed7aa;
+    }
+
     @keyframes alertPulse {
       0%, 100% { border-color: #fdba74; }
       50% { border-color: #f9735b; }
@@ -115,6 +148,33 @@
       color: #ea580c;
       font-weight: 700;
       text-decoration: underline;
+    }
+
+    /* Мягкий баннер переноса задач со вчера */
+    .rollover-card {
+      display: none;
+      background: var(--surface-subtle);
+      border: 1.5px dashed var(--primary);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      gap: 10px;
+      flex-direction: column;
+      font-size: 0.85rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .rollover-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .rollover-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
     }
 
     /* Шапка */
@@ -181,6 +241,11 @@
       transition: all 0.15s ease;
     }
 
+    body.dark-mode .sync-status-btn {
+      background: #3b2316;
+      color: #fed7aa;
+    }
+
     .sync-status-btn:hover {
       background: #fde5d2;
       border-color: #fed7aa;
@@ -211,11 +276,16 @@
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
+    body.dark-mode .trophy-counter {
+      background: #3b2316;
+      border-color: #9a3412;
+      color: #fed7aa;
+    }
+
     .trophy-counter.bounce-win {
       transform: scale(1.18);
     }
 
-    /* Поддерживающая карточка */
     .quote-banner {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -236,7 +306,6 @@
       gap: 10px;
     }
 
-    /* Сетка 2/3 и 1/3 */
     .main-workspace {
       display: grid;
       grid-template-columns: 2fr 1.15fr;
@@ -290,6 +359,10 @@
       border-color: var(--border-focus);
     }
 
+    body.dark-mode .btn-icon:hover {
+      background: #3b281c;
+    }
+
     .cal-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -329,11 +402,11 @@
     .cal-card.selected {
       border-color: var(--primary);
       box-shadow: 0 0 0 2px rgba(249, 115, 91, 0.25);
-      background: #fffdfb;
+      background: var(--surface-subtle);
     }
 
     .cal-card.today {
-      background: #fffcf9;
+      background: var(--surface-subtle);
     }
 
     .cal-card.today .card-date-badge {
@@ -468,6 +541,10 @@
       overflow: hidden;
     }
 
+    body.dark-mode .global-bar-track {
+      background: #44403c;
+    }
+
     .global-bar-fill {
       height: 100%;
       background: linear-gradient(90deg, #fb923c, #10b981);
@@ -480,8 +557,8 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: #fffaf5;
-      border: 1px dashed #fed7aa;
+      background: var(--surface-subtle);
+      border: 1px dashed var(--border-focus);
       border-radius: var(--radius-lg);
       padding: 14px;
       position: relative;
@@ -513,6 +590,12 @@
       font-size: 0.78rem;
       color: #9a3412;
       line-height: 1.4;
+    }
+
+    body.dark-mode .local-warning-badge {
+      background: #3a1d10;
+      border-color: #9a3412;
+      color: #fed7aa;
     }
 
     .local-warning-badge a {
@@ -552,7 +635,7 @@
 
     .form-choice-pill:hover {
       border-color: var(--border-focus);
-      background: #fff;
+      background: var(--surface);
     }
 
     .form-choice-pill.selected {
@@ -567,6 +650,9 @@
 
     .form-choice-pill.energy-high.selected { background: #fff1f2; color: #e11d48; }
     .form-choice-pill.energy-low.selected { background: #f5f5f4; color: #78716c; }
+
+    body.dark-mode .form-choice-pill.energy-high.selected { background: #4c111d; color: #fb7185; }
+    body.dark-mode .form-choice-pill.energy-low.selected { background: #44403c; color: #d6d3d1; }
 
     .btn-submit {
       background: var(--primary);
@@ -608,8 +694,8 @@
     }
 
     .task-card.is-done {
-      background: #fafdfb;
-      border-color: #d1fae5;
+      background: var(--surface-subtle);
+      border-color: #10b981;
     }
 
     .task-card.celebrate-pop {
@@ -655,6 +741,9 @@
     .pill-tag.energy-high { background: #fff1f2; color: #e11d48; }
     .pill-tag.energy-low { background: #f5f5f4; color: #78716c; }
 
+    body.dark-mode .pill-tag.energy-high { background: #4c111d; color: #fb7185; }
+    body.dark-mode .pill-tag.energy-low { background: #44403c; color: #d6d3d1; }
+
     .task-name-text {
       font-size: 0.95rem;
       font-weight: 600;
@@ -684,9 +773,17 @@
       color: var(--text-main);
     }
 
+    body.dark-mode .btn-action-icon:hover {
+      background: #44342a;
+    }
+
     .btn-action-icon.danger:hover {
       background: #fee2e2;
       color: #dc2626;
+    }
+
+    body.dark-mode .btn-action-icon.danger:hover {
+      background: #451a1a;
     }
 
     .slider-interactive-box {
@@ -703,6 +800,10 @@
       border-radius: 6px;
       display: flex;
       align-items: center;
+    }
+
+    body.dark-mode .slider-scale-track {
+      background: #44403c;
     }
 
     .slider-scale-fill {
@@ -755,12 +856,20 @@
     .subtask-row {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 9px;
       font-size: 0.85rem;
       transition: transform 0.15s ease;
       position: relative;
-      cursor: pointer;
       user-select: none;
+    }
+
+    .subtask-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex: 1;
+      cursor: pointer;
     }
 
     .subtask-row input[type=checkbox] {
@@ -805,6 +914,30 @@
       color: var(--text-dim);
     }
 
+    .btn-delete-subtask {
+      opacity: 0.35;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .subtask-row:hover .btn-delete-subtask {
+      opacity: 1;
+    }
+
+    .btn-delete-subtask:hover {
+      color: #ef4444;
+      background: #fee2e2;
+    }
+
+    body.dark-mode .btn-delete-subtask:hover {
+      background: #451a1a;
+    }
+
     .subtask-row.pop-anim {
       animation: subtaskPop 0.35s ease;
     }
@@ -829,9 +962,80 @@
       border-radius: var(--radius-sm);
       outline: none;
       background: var(--surface);
+      color: var(--text-main);
     }
 
-    /* Футер */
+    /* Режим Гиперфокуса («Одна задача») */
+    .hyperfocus-mode .top-bar,
+    .hyperfocus-mode .quote-banner,
+    .hyperfocus-mode .calendar-container,
+    .hyperfocus-mode .create-task-form,
+    .hyperfocus-mode .day-overall-card,
+    .hyperfocus-mode .app-footer,
+    .hyperfocus-mode .rollover-card {
+      display: none !important;
+    }
+
+    .hyperfocus-mode .main-workspace {
+      grid-template-columns: 1fr !important;
+      max-width: 680px;
+      margin: 40px auto 0;
+    }
+
+    .hyperfocus-banner {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .hyperfocus-mode .hyperfocus-banner {
+      display: flex;
+    }
+
+    /* Undo Toast */
+    .toast-undo {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #292524;
+      color: #faf8f5;
+      padding: 12px 20px;
+      border-radius: 40px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 10001;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 0.9rem;
+    }
+
+    body.dark-mode .toast-undo {
+      background: #faf8f5;
+      color: #292524;
+    }
+
+    .toast-undo.active {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-undo button {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+
     footer.app-footer {
       display: flex;
       justify-content: space-between;
@@ -861,6 +1065,7 @@
       gap: 5px;
       padding: 6px 10px;
       border-radius: var(--radius-sm);
+      color: var(--text-muted);
       transition: background 0.15s;
     }
 
@@ -868,6 +1073,11 @@
       color: #ea580c;
       background: #ffedd5;
       font-weight: 600;
+    }
+
+    body.dark-mode .btn-footer-demo {
+      background: #3c1e11;
+      color: #fed7aa;
     }
 
     .btn-footer-demo:hover {
@@ -882,6 +1092,10 @@
       background: #fee2e2;
     }
 
+    body.dark-mode .btn-footer-reset:hover {
+      background: #451a1a;
+    }
+
     .btn-donate-link {
       color: #b45309;
       background: #fef3c7;
@@ -894,6 +1108,12 @@
       align-items: center;
       gap: 6px;
       transition: all 0.15s ease;
+    }
+
+    body.dark-mode .btn-donate-link {
+      background: #39280d;
+      color: #fde68a;
+      border-color: #78350f;
     }
 
     .btn-donate-link:hover {
@@ -949,13 +1169,18 @@
       gap: 8px;
     }
 
+    body.dark-mode .sync-step-box {
+      background: #3b2316;
+      border-color: #9a3412;
+    }
+
     .sync-passphrase {
       font-family: monospace;
       font-size: 1.15rem;
       font-weight: 700;
       color: #ea580c;
       letter-spacing: 0.5px;
-      background: #fff;
+      background: var(--surface);
       padding: 8px 12px;
       border-radius: var(--radius-sm);
       border: 1px solid #fed7aa;
@@ -972,16 +1197,15 @@
       align-items: center;
       gap: 14px;
       transition: all 0.2s ease;
-      background: #ffffff;
+      background: var(--surface);
     }
 
     .onboarding-option-card:hover {
       border-color: var(--primary);
-      background: #fffbf7;
+      background: var(--surface-subtle);
       transform: translateY(-1px);
     }
 
-    /* Блоки справки */
     .help-section-item {
       display: flex;
       gap: 12px;
@@ -992,13 +1216,13 @@
       width: 32px;
       height: 32px;
       border-radius: var(--radius-sm);
-      background: #fff7ed;
+      background: var(--surface-subtle);
       color: var(--primary);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      border: 1px solid #fed7aa;
+      border: 1px solid var(--border-soft);
     }
 
     #confettiCanvas {
@@ -1009,6 +1233,11 @@
       height: 100%;
       pointer-events: none;
       z-index: 10000;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 1024px) {
@@ -1064,6 +1293,12 @@
 
   <canvas id="confettiCanvas"></canvas>
 
+  <!-- Тост мягкого удаления с отменой -->
+  <div class="toast-undo" id="undoToast">
+    <span id="undoToastText">Задача удалена</span>
+    <button id="btnUndoAction">Отменить</button>
+  </div>
+
   <div class="app-viewport">
     
     <!-- Баннер перегрузки бесплатной квоты базы -->
@@ -1104,6 +1339,21 @@
       </div>
 
       <div class="header-actions">
+        <!-- Кнопка Темы (Светлая / Тёмная) -->
+        <button class="btn-icon" id="btnThemeToggle" title="Переключить тему" style="border-radius: 50%; width: 38px; height: 38px; padding: 0;">
+          <svg class="icon" id="themeIcon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
         <!-- Кнопка Инструкции (?) -->
         <button class="btn-icon" id="btnOpenHelp" title="Как пользоваться приложением" style="border-radius: 50%; width: 38px; height: 38px; padding: 0;">
           <svg class="icon" viewBox="0 0 24 24">
@@ -1150,6 +1400,14 @@
       </button>
     </div>
 
+    <!-- Панель выхода из гиперфокуса -->
+    <div class="hyperfocus-banner" id="hyperfocusBanner">
+      <span style="font-weight: 700; color: var(--primary);">🎯 Режим гиперфокуса активен</span>
+      <button class="btn-submit" id="btnExitHyperfocus" style="padding: 6px 14px; font-size: 0.82rem;">
+        Показать все задачи
+      </button>
+    </div>
+
     <!-- Основная сетка: 2/3 и 1/3 -->
     <main class="main-workspace">
       
@@ -1181,6 +1439,19 @@
 
       <!-- Справа: Фокус-панель дня -->
       <aside class="focus-sidebar" id="focusSidebar">
+        
+        <!-- Баннер мягкого переноса вчерашних дел -->
+        <div class="rollover-card" id="rolloverCard">
+          <div class="rollover-card-header">
+            <span>Вчера остались незаконченные дела:</span>
+          </div>
+          <div id="rolloverTasksNames" style="color: var(--text-muted); font-size: 0.8rem;"></div>
+          <div class="rollover-actions">
+            <button class="btn-icon" id="btnDismissRollover" style="font-size: 0.78rem; padding: 4px 8px;">Оставить там</button>
+            <button class="btn-submit" id="btnAcceptRollover" style="font-size: 0.78rem; padding: 5px 10px;">Перенести на сегодня</button>
+          </div>
+        </div>
+
         <div class="sidebar-header">
           <h3 id="sidebarDayDate">План на день</h3>
           
@@ -1205,7 +1476,6 @@
             required 
           />
 
-          <!-- Человеческое предупреждение о локальном хранении -->
           <div class="local-warning-badge" id="localWarningBadge">
             <svg class="icon" style="width: 16px; height: 16px; flex-shrink: 0;" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"></circle>
@@ -1272,7 +1542,7 @@
         <button class="btn-footer-link btn-footer-reset" id="btnResetAll">
           <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
           Сбросить всё
-        </button>       
+        </button>        
         
         <!-- Экспорт -->
         <button class="btn-footer-link" id="btnExportJson" title="Сохранить файл на случай чистки браузера">
@@ -1286,8 +1556,6 @@
           Импорт из файла
         </button>
         <input type="file" id="fileImportInput" accept=".json" style="display: none;" />
-
-
       </div>
 
       <div>
@@ -1306,7 +1574,7 @@
 
   </div>
 
-  <!-- Модальное окно: Краткая и понятная инструкция (?) -->
+  <!-- Модальное окно справки (?) -->
   <div class="modal-overlay" id="helpModal" style="display: none;">
     <div class="modal-card">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-soft); padding-bottom: 12px;">
@@ -1332,7 +1600,7 @@
           <div>
             <b>1. Календарь-теплокарта (Слева)</b>
             <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
-              В каждом дне максимум 9 цветных кубиков по категориям. Выполненная задача становится серой с галочкой. Иконка в углу дня показывает общую загрузку: листик — легко (1–3), лимон — средняя норма (4–6), огонёк — плотный день (7–9).
+              В каждом дне максимум 9 цветных кубиков по категориям. Выполненная задача становится серой с галочкой. Иконка в углу дня показывает общую загрузку: листик — легко (1–3), лимон — норма (4–6), огонёк — плотно (7–9).
             </div>
           </div>
         </div>
@@ -1342,9 +1610,21 @@
             <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           </div>
           <div>
-            <b>2. Быстрый старт на 5 минут</b>
+            <b>2. Точный 5-минутный таймер со звуком</b>
             <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
-              Трудно начать объемное дело? Нажмите значок молнии на карточке задачи — запустится бережный таймер на 5 минут без ожиданий и требований к идеалу, чтобы снять ступор перед стартом.
+              Нажмите значок молнии на карточке задачи — запустится бережный таймер, который не замрёт, даже если вы свернёте браузер, а в конце прозвучит мягкий колокольчик.
+            </div>
+          </div>
+        </div>
+
+        <div class="help-section-item">
+          <div class="help-icon-badge">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+          </div>
+          <div>
+            <b>3. Режим «Одна задача на экране»</b>
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
+              Кликните по иконке мишени у задачи, чтобы изолировать её ото всех отвлекающих деталей и сконцентрироваться только на текущем шаге.
             </div>
           </div>
         </div>
@@ -1354,33 +1634,9 @@
             <svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
           </div>
           <div>
-            <b>3. Дробилка на микро-шаги и прогресс</b>
+            <b>4. Дробилка на микро-шаги и звуки</b>
             <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
-              Разбивайте дела на простые шаги (например: «открыть файл», «написать строку»). Каждая галочка синхронно двигает ползунок задачи, выдавая порцию дофамина.
-            </div>
-          </div>
-        </div>
-
-        <div class="help-section-item">
-          <div class="help-icon-badge">
-            <svg class="icon" viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
-          </div>
-          <div>
-            <b>4. Перенос без чувства вины («Завтра»)</b>
-            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
-              Не успели сегодня? Нажмите кнопку с двойной стрелкой — задача бесшовно переместится на следующий день без мигающих красных штрафов и упрёков.
-            </div>
-          </div>
-        </div>
-
-        <div class="help-section-item">
-          <div class="help-icon-badge">
-            <svg class="icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-          </div>
-          <div>
-            <b>5. Синхронизация между устройствами</b>
-            <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 2px;">
-              Нажмите кнопку в шапке, скопируйте короткую фразу-ключ и вставьте её на втором устройстве. Всё синхронизируется в реальном времени.
+              Разбивайте дела на простые шаги. Каждая галочка издает приятный звуковой щелчок, а победа в 100% награждает вас аккордом и салютом! Микро-шаги теперь можно легко удалять крестиком.
             </div>
           </div>
         </div>
@@ -1393,7 +1649,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно 5-минутного таймера -->
+  <!-- Модальное окно точного 5-минутного таймера -->
   <div class="modal-overlay" id="boosterModal" style="display: none;">
     <div class="modal-card">
       <div style="display: flex; justify-content: center;">
@@ -1415,7 +1671,7 @@
     </div>
   </div>
 
-  <!-- Приветственное окно (СДВГ-френдли, лаконичное) -->
+  <!-- Приветственное окно -->
   <div class="modal-overlay" id="welcomeModal" style="display: none;">
     <div class="modal-card">
       <h3 style="font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
@@ -1467,7 +1723,6 @@
         </button>
       </div>
 
-      <!-- Блок ввода ключа (если уже есть ключ) -->
       <div id="sectionConnectKey" style="display: flex; flex-direction: column; gap: 8px;">
         <div style="font-size: 0.84rem; font-weight: 700; color: var(--text-main);">
           Ввести ключ с другого устройства:
@@ -1482,7 +1737,6 @@
         <div id="syncErrorMessage" style="display: none; color: #dc2626; font-size: 0.78rem;"></div>
       </div>
 
-      <!-- Блок созданного ключа (если создали ключ) -->
       <div id="sectionCurrentKey" class="sync-step-box" style="margin-top: 4px;">
         <div style="font-size: 0.84rem; font-weight: 700; color: #9a3412;" id="currentKeySectionTitle">
           Ваш ключ для подключения:
@@ -1553,6 +1807,7 @@
     const STORAGE_KEY_SETTINGS = 'dopafocus_settings_v9';
     const STORAGE_KEY_VAULT = 'dopafocus_vault_id';
     const STORAGE_KEY_SEEN_ONBOARD = 'dopafocus_seen_onboard_v2';
+    const STORAGE_KEY_THEME = 'dopafocus_theme';
 
     const MOTIVATIONAL_QUOTES = [
       "«Даже самое маленькое действие — это победа над параличом старта. Ты молодец!»",
@@ -1582,9 +1837,17 @@
     let selectedCategory = 'study';
     let selectedEnergy = 'high';
 
+    // Точный таймер без зависаний
     let boosterSeconds = 300;
     let boosterTimerId = null;
     let isBoosterActive = false;
+    let boosterTargetTimestamp = null;
+    let boosterRemainingOnPause = 300;
+
+    // Режим гиперфокуса и мягкое удаление
+    let hyperfocusTaskId = null;
+    let lastDeletedTask = null;
+    let undoToastTimeout = null;
 
     let firestoreDb = null;
     let currentAuthUser = null;
@@ -1593,7 +1856,78 @@
     let isRemoteUpdateInProgress = false;
 
     /* ==========================================================
-       SVG ИКОНКИ НАГРУЗКИ (Листик, Лимон, Огонёк)
+       СИНТЕЗАТОР ЗВУКОВ (Web Audio API)
+       ========================================================== */
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Звук клика по чекбоксу
+    function playStepSound() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08); // A5
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch (e) {}
+    }
+
+    // Звук 100% победы над задачей (мажорное трезвучие)
+    function playWinSound() {
+      try {
+        const ctx = getAudioContext();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.07);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime + idx * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.07 + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.07);
+          osc.stop(ctx.currentTime + idx * 0.07 + 0.25);
+        });
+      } catch (e) {}
+    }
+
+    // Мягкий сигнал завершения таймера
+    function playChimeSound() {
+      try {
+        const ctx = getAudioContext();
+        [880, 1174.66].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.8);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.18);
+          osc.stop(ctx.currentTime + i * 0.18 + 0.8);
+        });
+      } catch (e) {}
+    }
+
+    /* ==========================================================
+       SVG ИКОНКИ
        ========================================================== */
     function getLoadBadgeSvg(count) {
       if (count === 0) return '';
@@ -1706,10 +2040,83 @@
     function checkLocalWarningBadge() {
       const hasVault = localStorage.getItem(STORAGE_KEY_VAULT);
       const warnBadge = document.getElementById('localWarningBadge');
-      if (!hasVault) {
-        warnBadge.style.display = 'flex';
+      if (warnBadge) {
+        warnBadge.style.display = !hasVault ? 'flex' : 'none';
+      }
+    }
+
+    /* ==========================================================
+       ТЁМНАЯ ТЕМА
+       ========================================================== */
+    function applyTheme(isDark) {
+      if (isDark) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('themeIcon').innerHTML = `
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        `;
       } else {
-        warnBadge.style.display = 'none';
+        document.body.classList.remove('dark-mode');
+        document.getElementById('themeIcon').innerHTML = `
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        `;
+      }
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
+
+      document.getElementById('btnThemeToggle').addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem(STORAGE_KEY_THEME, isDark ? 'dark' : 'light');
+        applyTheme(isDark);
+      });
+    }
+
+    /* ==========================================================
+       МЯГКИЙ ПЕРЕНОС НЕЗАВЕРШЁННЫХ ДЕЛ (ROLLOVER)
+       ========================================================== */
+    function checkYesterdayUnfinishedTasks() {
+      const todayKey = formatDateToKey(new Date());
+      const card = document.getElementById('rolloverCard');
+
+      if (selectedDateString !== todayKey) {
+        card.style.display = 'none';
+        return;
+      }
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = formatDateToKey(yesterday);
+
+      const unfinished = tasks.filter(t => t.date === yesterdayKey && (t.progress || 0) < 100);
+
+      if (unfinished.length > 0) {
+        const namesContainer = document.getElementById('rolloverTasksNames');
+        namesContainer.textContent = unfinished.map(t => `• ${t.title}`).join(', ');
+        card.style.display = 'flex';
+
+        document.getElementById('btnAcceptRollover').onclick = () => {
+          unfinished.forEach(t => { t.date = todayKey; });
+          card.style.display = 'none';
+          triggerCloudSync();
+          renderAll();
+        };
+
+        document.getElementById('btnDismissRollover').onclick = () => {
+          card.style.display = 'none';
+        };
+      } else {
+        card.style.display = 'none';
       }
     }
 
@@ -1839,9 +2246,6 @@
         });
     }
 
-    /* ==========================================================
-       ОНБОРДИНГ
-       ========================================================== */
     function checkFirstTimeOnboarding() {
       const alreadySeen = localStorage.getItem(STORAGE_KEY_SEEN_ONBOARD);
       const hasVault = localStorage.getItem(STORAGE_KEY_VAULT);
@@ -1874,21 +2278,11 @@
         ]},
         { offsetDay: -1, items: [
           { title: "Встреча по командному проекту", cat: "work", energy: "high", p: 100, sub: [] },
-          { title: "Полить домашние растения", cat: "home", energy: "low", p: 100, sub: [] }
+          { title: "Полить домашние растения", cat: "home", energy: "low", p: 0, sub: [] }
         ]},
         { offsetDay: 1, items: [
           { title: "Черновик отчёта для руководителя", cat: "work", energy: "high", p: 0, sub: ["Собрать графики", "Написать выводы"] },
-          { title: "Анализ научной статьи", cat: "study", energy: "high", p: 0, sub: [] },
-          { title: "Оплатить счета за квартиру", cat: "home", energy: "low", p: 0, sub: [] },
-          { title: "Повторить конспект лекции", cat: "study", energy: "low", p: 0, sub: [] },
-          { title: "Дыхательная практика 10 минут", cat: "rest", energy: "low", p: 0, sub: [] },
-          { title: "Разобрать рабочий стол", cat: "home", energy: "low", p: 0, sub: [] },
-          { title: "Звонок близким", cat: "rest", energy: "low", p: 0, sub: [] }
-        ]},
-        { offsetDay: 2, items: [
-          { title: "Практическое задание №2", cat: "study", energy: "high", p: 25, sub: ["Открыть IDE", "Написать тесты"] },
-          { title: "Стирка и порядок в комнате", cat: "home", energy: "low", p: 0, sub: [] },
-          { title: "Просмотр лекции TED", cat: "rest", energy: "low", p: 0, sub: [] }
+          { title: "Анализ научной статьи", cat: "study", energy: "high", p: 0, sub: [] }
         ]}
       ];
 
@@ -1920,7 +2314,7 @@
     }
 
     /* ==========================================================
-       ДОФАМИН: АНИМАЦИИ
+       КОНФЕТТИ
        ========================================================== */
     const canvas = document.getElementById('confettiCanvas');
     const ctx = canvas.getContext('2d');
@@ -1975,7 +2369,7 @@
       runAnimationLoop();
     }
 
-    let isAnimActive = false;
+let isAnimActive = false;
     function runAnimationLoop() {
       if (isAnimActive) return;
       isAnimActive = true;
@@ -2010,10 +2404,10 @@
               ctx.fillStyle = p.color;
               ctx.globalAlpha = Math.max(0, p.alpha);
               ctx.beginPath();
-              ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+              ctx.arc(0, 0, Math.max(0.5, p.size), 0, Math.PI * 2);
               ctx.fill();
             }
-            ctx.restore();
+            ctx.restore(); // <-- Было ctx.restore; теперь метод корректно восстанавливает холст
           }
         });
 
@@ -2115,8 +2509,8 @@
           selectedDateString = dateKey;
           renderCalendar();
           renderSidebar();
+          checkYesterdayUnfinishedTasks();
 
-          // 1. ПЛАВНЫЙ СКРОЛЛ НА МОБИЛЬНЫХ К ЗАДАЧАМ
           if (window.innerWidth <= 1024) {
             const sidebar = document.getElementById('focusSidebar');
             if (sidebar) {
@@ -2135,23 +2529,30 @@
     function renderSidebar() {
       document.getElementById('sidebarDayDate').textContent = getReadableDate(selectedDateString);
 
-      const dayTasks = tasks.filter(t => t.date === selectedDateString);
+      let dayTasks = tasks.filter(t => t.date === selectedDateString);
+      
+      // Фильтр для режима гиперфокуса
+      if (hyperfocusTaskId) {
+        dayTasks = dayTasks.filter(t => t.id === hyperfocusTaskId);
+      }
+
       const statsText = document.getElementById('dayTasksStatsText');
       const pctText = document.getElementById('dayProgressPercentText');
       const overallFill = document.getElementById('dayOverallFill');
       const btnSubmit = document.getElementById('btnSubmitTask');
 
+      const allDayTasks = tasks.filter(t => t.date === selectedDateString);
       let overallPct = 0;
-      if (dayTasks.length > 0) {
-        const sum = dayTasks.reduce((acc, item) => acc + (item.progress || 0), 0);
-        overallPct = Math.round(sum / dayTasks.length);
+      if (allDayTasks.length > 0) {
+        const sum = allDayTasks.reduce((acc, item) => acc + (item.progress || 0), 0);
+        overallPct = Math.round(sum / allDayTasks.length);
       }
 
-      statsText.textContent = `${dayTasks.length} из 9 кубиков занято`;
+      statsText.textContent = `${allDayTasks.length} из 9 кубиков занято`;
       pctText.textContent = `${overallPct}% выполнено`;
       overallFill.style.width = `${overallPct}%`;
 
-      if (dayTasks.length >= 9) {
+      if (allDayTasks.length >= 9) {
         btnSubmit.disabled = true;
         btnSubmit.style.opacity = '0.6';
         btnSubmit.style.cursor = 'not-allowed';
@@ -2169,7 +2570,7 @@
       if (dayTasks.length === 0) {
         listContainer.innerHTML = `
           <div style="text-align: center; color: var(--text-dim); padding: 40px 10px; font-size: 0.9rem;">
-            День полностью свободен.<br>Добавьте задачу выше или позвольте себе перевести дух 
+            День полностью свободен.<br>Добавьте задачу выше или позвольте себе перевести дух 🌿
           </div>
         `;
         return;
@@ -2209,6 +2610,13 @@
         const actions = document.createElement('div');
         actions.className = 'action-icon-group';
 
+        // Кнопка режима «Одна задача» (Гиперфокус)
+        const btnHyperfocus = document.createElement('button');
+        btnHyperfocus.className = 'btn-action-icon';
+        btnHyperfocus.title = 'Сфокусироваться только на этой задаче';
+        btnHyperfocus.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle></svg>`;
+        btnHyperfocus.addEventListener('click', () => toggleHyperfocus(task.id));
+
         const btnBooster = document.createElement('button');
         btnBooster.className = 'btn-action-icon';
         btnBooster.title = '5-минутный легкий старт';
@@ -2225,8 +2633,9 @@
         btnDelete.className = 'btn-action-icon danger';
         btnDelete.title = 'Удалить';
         btnDelete.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>`;
-        btnDelete.addEventListener('click', () => deleteTask(task.id));
+        btnDelete.addEventListener('click', () => deleteTaskWithUndo(task.id));
 
+        actions.appendChild(btnHyperfocus);
         actions.appendChild(btnBooster);
         actions.appendChild(btnReschedule);
         actions.appendChild(btnDelete);
@@ -2283,6 +2692,9 @@
           row.id = `sub_${st.id}`;
           row.className = `subtask-row ${st.done ? 'checked' : ''}`;
 
+          const leftWrap = document.createElement('div');
+          leftWrap.className = 'subtask-left';
+
           const cbInput = document.createElement('input');
           cbInput.type = 'checkbox';
           cbInput.checked = st.done;
@@ -2299,11 +2711,11 @@
           textSpan.className = 'subtask-text';
           textSpan.textContent = st.text;
 
-          row.appendChild(cbInput);
-          row.appendChild(customBox);
-          row.appendChild(textSpan);
+          leftWrap.appendChild(cbInput);
+          leftWrap.appendChild(customBox);
+          leftWrap.appendChild(textSpan);
 
-          row.addEventListener('click', () => {
+          leftWrap.addEventListener('click', () => {
             const nextState = !cbInput.checked;
             cbInput.checked = nextState;
             if (nextState) {
@@ -2311,10 +2723,23 @@
               void row.offsetWidth;
               row.classList.add('pop-anim');
               spawnSparklesAtElement(customBox);
+              playStepSound();
             }
             toggleSubtask(task.id, st.id);
           });
 
+          // Кнопка удаления микро-шага
+          const btnDelSub = document.createElement('button');
+          btnDelSub.className = 'btn-delete-subtask';
+          btnDelSub.title = 'Удалить микро-шаг';
+          btnDelSub.innerHTML = `<svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+          btnDelSub.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteSubtask(task.id, st.id);
+          });
+
+          row.appendChild(leftWrap);
+          row.appendChild(btnDelSub);
           subBox.appendChild(row);
         });
 
@@ -2357,7 +2782,22 @@
     }
 
     /* ==========================================================
-       ОПЕРАЦИИ С ЗАДАЧАМИ
+       РЕЖИМ «ОДНА ЗАДАЧА» (ГИПЕРФОКУС)
+       ========================================================== */
+    function toggleHyperfocus(taskId) {
+      hyperfocusTaskId = taskId;
+      document.body.classList.add('hyperfocus-mode');
+      renderSidebar();
+    }
+
+    function exitHyperfocus() {
+      hyperfocusTaskId = null;
+      document.body.classList.remove('hyperfocus-mode');
+      renderAll();
+    }
+
+    /* ==========================================================
+       ОПЕРАЦИИ С ЗАДАЧАМИ И МЯГКОЕ УДАЛЕНИЕ (UNDO)
        ========================================================== */
     function addTask(title, category, energy) {
       const currentDayTasks = tasks.filter(t => t.date === selectedDateString);
@@ -2390,6 +2830,7 @@
       if (progressVal === 100 && oldVal < 100) {
         settings.totalWins = (settings.totalWins || 0) + 1;
         animateTrophy();
+        playWinSound();
 
         if (finishedInteracting) {
           fireConfetti();
@@ -2416,6 +2857,16 @@
       if (!task.subtasks) task.subtasks = [];
 
       task.subtasks.push({ id: 'st_' + Date.now(), text, done: false });
+      recalcProgressFromSteps(task);
+      triggerCloudSync();
+      renderAll();
+    }
+
+    function deleteSubtask(taskId, subId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task || !task.subtasks) return;
+
+      task.subtasks = task.subtasks.filter(s => s.id !== subId);
       recalcProgressFromSteps(task);
       triggerCloudSync();
       renderAll();
@@ -2449,59 +2900,100 @@
       dateObj.setDate(dateObj.getDate() + 1);
       task.date = formatDateToKey(dateObj);
 
+      if (hyperfocusTaskId === taskId) {
+        exitHyperfocus();
+      }
+
       triggerCloudSync();
       renderAll();
     }
 
-    function deleteTask(taskId) {
-      const task = tasks.find(t => t.id === taskId);
-      if (!task) return;
+    // Мягкое удаление задачи с отменой (без confirm)
+    function deleteTaskWithUndo(taskId) {
+      const idx = tasks.findIndex(t => t.id === taskId);
+      if (idx === -1) return;
 
-      if (confirm(`Удалить кубик задачи "${task.title}"?`)) {
-        if (task.progress === 100 && settings.totalWins > 0) {
-          settings.totalWins--;
+      lastDeletedTask = { task: tasks[idx], index: idx };
+      if (lastDeletedTask.task.progress === 100 && settings.totalWins > 0) {
+        settings.totalWins--;
+      }
+
+      tasks.splice(idx, 1);
+      if (hyperfocusTaskId === taskId) {
+        exitHyperfocus();
+      }
+
+      triggerCloudSync();
+      renderAll();
+
+      const toast = document.getElementById('undoToast');
+      document.getElementById('undoToastText').textContent = `«${lastDeletedTask.task.title}» удалена`;
+      toast.classList.add('active');
+
+      clearTimeout(undoToastTimeout);
+      undoToastTimeout = setTimeout(() => {
+        toast.classList.remove('active');
+        lastDeletedTask = null;
+      }, 5000);
+    }
+
+    document.getElementById('btnUndoAction').addEventListener('click', () => {
+      if (lastDeletedTask) {
+        tasks.splice(lastDeletedTask.index, 0, lastDeletedTask.task);
+        if (lastDeletedTask.task.progress === 100) {
+          settings.totalWins = (settings.totalWins || 0) + 1;
         }
-        tasks = tasks.filter(t => t.id !== taskId);
+        lastDeletedTask = null;
+        document.getElementById('undoToast').classList.remove('active');
         triggerCloudSync();
         renderAll();
       }
-    }
+    });
 
     /* ==========================================================
-       ТАЙМЕР "ЛЕГКИЙ СТАРТ" (5 МИНУТ)
+       ТОЧНЫЙ ТАЙМЕР БЕЗ ЗАВИСАНИЙ
        ========================================================== */
     function startBoosterTimer(title) {
+      getAudioContext(); // прогреваем аудио контекст
       document.getElementById('boosterTitleText').textContent = `Фокус: ${title}`;
-      boosterSeconds = 300;
+      boosterRemainingOnPause = 300;
       isBoosterActive = true;
-      updateBoosterText();
+      boosterTargetTimestamp = Date.now() + boosterRemainingOnPause * 1000;
+      
+      updateBoosterText(boosterRemainingOnPause);
       document.getElementById('boosterModal').style.display = 'flex';
       document.getElementById('btnToggleBooster').textContent = 'Пауза';
 
       clearInterval(boosterTimerId);
       boosterTimerId = setInterval(() => {
         if (!isBoosterActive) return;
-        boosterSeconds--;
-        updateBoosterText();
+        
+        const now = Date.now();
+        const diffMs = boosterTargetTimestamp - now;
+        const remainingSec = Math.max(0, Math.ceil(diffMs / 1000));
+        
+        updateBoosterText(remainingSec);
 
-        if (boosterSeconds <= 0) {
+        if (remainingSec <= 0) {
           clearInterval(boosterTimerId);
+          isBoosterActive = false;
           fireConfetti();
-          alert("5 минут фокуса позади! Ты успешно преодолел барьер старта.");
+          playChimeSound();
           closeBooster();
         }
-      }, 1000);
+      }, 250);
     }
 
-    function updateBoosterText() {
-      const m = Math.floor(boosterSeconds / 60);
-      const s = boosterSeconds % 60;
+    function updateBoosterText(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
       document.getElementById('boosterTimerDigits').textContent = 
         `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     function closeBooster() {
       clearInterval(boosterTimerId);
+      isBoosterActive = false;
       document.getElementById('boosterModal').style.display = 'none';
     }
 
@@ -2511,7 +3003,7 @@
     function exportBackupFile() {
       const backupData = {
         app: "DopaFocus",
-        version: "1.0",
+        version: "2.0",
         exportedAt: new Date().toISOString(),
         vaultId: localStorage.getItem(STORAGE_KEY_VAULT) || null,
         settings: settings,
@@ -2574,6 +3066,7 @@
       document.getElementById('totalWinsCount').textContent = settings.totalWins || 0;
       renderCalendar();
       renderSidebar();
+      checkYesterdayUnfinishedTasks();
       checkLocalWarningBadge();
     }
 
@@ -2656,11 +3149,23 @@
         }
       });
 
-      // Бустер
+      // Кнопка выхода из гиперфокуса
+      document.getElementById('btnExitHyperfocus').addEventListener('click', exitHyperfocus);
+
+      // Бустер (Таймер)
       document.getElementById('btnCloseBooster').addEventListener('click', closeBooster);
       document.getElementById('btnToggleBooster').addEventListener('click', () => {
-        isBoosterActive = !isBoosterActive;
-        document.getElementById('btnToggleBooster').textContent = isBoosterActive ? 'Пауза' : 'Продолжить';
+        if (isBoosterActive) {
+          // Ставим на паузу
+          isBoosterActive = false;
+          boosterRemainingOnPause = Math.max(0, Math.ceil((boosterTargetTimestamp - Date.now()) / 1000));
+          document.getElementById('btnToggleBooster').textContent = 'Продолжить';
+        } else {
+          // Продолжаем
+          isBoosterActive = true;
+          boosterTargetTimestamp = Date.now() + boosterRemainingOnPause * 1000;
+          document.getElementById('btnToggleBooster').textContent = 'Пауза';
+        }
       });
 
       // Модалка справки (?)
@@ -2727,7 +3232,6 @@
         if (e.target === syncModal) syncModal.style.display = 'none';
       });
 
-      // Генерация фразы
       document.getElementById('btnGenerateVaultKey').addEventListener('click', () => {
         const newKey = generateSecurePassphrase();
         localStorage.setItem(STORAGE_KEY_VAULT, newKey);
@@ -2744,7 +3248,6 @@
         }
       });
 
-      // Подключение по фразе со второго устройства
       document.getElementById('btnConnectVault').addEventListener('click', async () => {
         const errEl = document.getElementById('syncErrorMessage');
         errEl.style.display = 'none';
@@ -2786,7 +3289,6 @@
         }
       });
 
-      // Онбординг (СДВГ-френдли сценарии)
       const welcomeModal = document.getElementById('welcomeModal');
       const closeWelcome = () => {
         localStorage.setItem(STORAGE_KEY_SEEN_ONBOARD, 'true');
@@ -2795,13 +3297,11 @@
 
       document.getElementById('btnSkipOnboarding').addEventListener('click', closeWelcome);
 
-      // Вариант 1: Есть ключ -> открываем только поле ввода
       document.getElementById('btnOnboardConnectExisting').addEventListener('click', () => {
         closeWelcome();
         openSyncModalFn('connect');
       });
 
-      // Вариант 2: Создать ключ -> сразу генерируем и показываем только его с пояснением
       document.getElementById('btnOnboardCreateNew').addEventListener('click', () => {
         closeWelcome();
         document.getElementById('btnGenerateVaultKey').click();
@@ -2823,6 +3323,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       loadLocalStorage();
       initListeners();
       renderAll();
