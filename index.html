@@ -1116,12 +1116,7 @@
         <!-- Кнопка Синхронизации / Облака -->
         <button class="sync-status-btn" id="btnOpenSyncModal" title="Открыть настройки доступа с других устройств">
           <span class="sync-status-dot" id="syncStatusDot"></span>
-          <span id="syncStatusLabel">Только здесь</span>
-          <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
-            <rect width="20" height="14" x="2" y="3" rx="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
+          <span id="syncStatusLabel">Локально</span>
         </button>
 
         <div class="trophy-counter" id="trophyBadge" title="Копилка побед">
@@ -1274,6 +1269,11 @@
           Демо-данные
         </button>
         
+        <button class="btn-footer-link btn-footer-reset" id="btnResetAll">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+          Сбросить всё
+        </button>       
+        
         <!-- Экспорт -->
         <button class="btn-footer-link" id="btnExportJson" title="Сохранить файл на случай чистки браузера">
           <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -1287,10 +1287,7 @@
         </button>
         <input type="file" id="fileImportInput" accept=".json" style="display: none;" />
 
-        <button class="btn-footer-link btn-footer-reset" id="btnResetAll">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-          Сбросить всё
-        </button>
+
       </div>
 
       <div>
@@ -1733,7 +1730,7 @@
         if (vaultId) {
           bindRealtimeVault(vaultId);
         } else {
-          updateSyncStatusUI('offline', 'Только здесь');
+          updateSyncStatusUI('offline', 'Локально');
           checkFirstTimeOnboarding();
         }
       } catch (e) {
@@ -1784,7 +1781,7 @@
         (docSnap) => {
           if (!docSnap.exists) {
             pushToCloudImmediately();
-            updateSyncStatusUI('online', 'Связано');
+            updateSyncStatusUI('online', 'Онлайн');
             return;
           }
 
@@ -1800,7 +1797,7 @@
             renderAll();
             isRemoteUpdateInProgress = false;
           }
-          updateSyncStatusUI('online', 'Связано');
+          updateSyncStatusUI('online', 'Онлайн');
         },
         (error) => {
           handleFirebaseError(error);
@@ -1835,7 +1832,7 @@
 
       firestoreDb.collection('dopafocus_vaults').doc(vaultId).set(payload, { merge: true })
         .then(() => {
-          updateSyncStatusUI('online', 'Связано');
+          updateSyncStatusUI('online', 'Онлайн');
         })
         .catch((err) => {
           handleFirebaseError(err);
