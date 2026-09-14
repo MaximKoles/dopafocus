@@ -2176,43 +2176,47 @@ function initTheme() {
       if (banner) banner.style.display = 'flex';
     }
 
-    function bindRealtimeVault(vaultId) {
-      if (!firestoreDb || !vaultId || !currentAuthUser) return;
+function bindRealtimeVault(vaultId) {
+  if (!firestoreDb || !vaultId || !currentAuthUser) return;
 
-      if (unsubscribeSnapshot) {
-        unsubscribeSnapshot();
+  if (unsubscribeSnapshot) {
+    unsubscribeSnapshot();
+  }
+
+  updateSyncStatusUI('syncing', 'Связывание...');
+  const docRef = firestoreDb.collection('dopafocus_vaults').doc(vaultId);
+
+  unsubscribeSnapshot = docRef.onSnapshot(
+    (docSnap) => {
+      if (!docSnap.exists) {
+        pushToCloudImmediately();
+        updateSyncStatusUI('online', 'Онлайн');
+        return;
       }
 
-      updateSyncStatusUI('syncing', 'Связывание...');
-      const docRef = firestoreDb.collection('dopafocus_vaults').doc(vaultId);
-
-      unsubscribeSnapshot = docRef.onSnapshot(
-        (docSnap) => {
-          if (!docSnap.exists) {
-            pushToCloudImmediately();
-            updateSyncStatusUI('online', 'Онлайн');
-            return;
-          }
-
-          const remoteData = docSnap.data();
-          if (remoteData && remoteData.lastUpdated > (settings.lastUpdated || 0)) {
-            isRemoteUpdateInProgress = true;
-            tasks = remoteData.tasks || [];
-            settings = {
-              totalWins: remoteData.totalWins || 0,
-              lastUpdated: remoteData.lastUpdated
-            };
-            saveLocalStorage();
-            renderAll();
-            isRemoteUpdateInProgress = false;
-          }
-          updateSyncStatusUI('online', 'Онлайн');
-        },
-        (error) => {
-          handleFirebaseError(error);
-        }
-      );
+      const remoteData = docSnap.data();
+      // Если на сервере данные новее, обновляем локальные
+      if (remoteData && remoteData.lastUpdated > (settings.lastUpdated || 0)) {
+        isRemoteUpdateInProgress = true;
+        tasks = remoteData.tasks || [];
+        settings = {
+          totalWins: remoteData.totalWins || 0,
+          lastUpdated: remoteData.lastUpdated
+        };
+        saveLocalStorage();
+        renderAll();
+        isRemoteUpdateInProgress = false;
+      } else if (remoteData && (settings.lastUpdated || 0) > remoteData.lastUpdated) {
+        // Если локальные данные новее серверных (например, создали ключ на устройстве с готовыми задачами)
+        pushToCloudImmediately();
+      }
+      updateSyncStatusUI('online', 'Онлайн');
+    },
+    (error) => {
+      handleFirebaseError(error);
     }
+  );
+}
 
     function triggerCloudSync() {
       saveLocalStorage();
@@ -3238,6 +3242,7 @@ let isAnimActive = false;
         const newKey = generateSecurePassphrase();
         localStorage.setItem(STORAGE_KEY_VAULT, newKey);
         passDisplay.textContent = newKey;
+        pushToCloudImmediately(); // Создаёт документ в Firestore прямо сейчас
         bindRealtimeVault(newKey);
         checkLocalWarningBadge();
       });
