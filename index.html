@@ -853,15 +853,47 @@
       gap: 8px;
     }
 
+    .subtask-drag-handle {
+      cursor: grab;
+      color: var(--text-dim);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 5px;
+      user-select: none;
+      flex-shrink: 0;
+      touch-action: none;
+      border-radius: 4px;
+      transition: color 0.15s ease, background-color 0.15s ease;
+    }
+    .subtask-drag-handle:hover {
+      color: var(--primary);
+      background: rgba(249, 115, 91, 0.1);
+    }
+    .subtask-drag-handle:active {
+      cursor: grabbing;
+    }
     .subtask-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 9px;
       font-size: 0.85rem;
-      transition: transform 0.15s ease;
       position: relative;
       user-select: none;
+      border-radius: var(--radius-sm);
+      padding: 3px 4px;
+      transition: opacity 0.15s ease, background-color 0.15s ease, box-shadow 0.12s ease;
+    }
+    .subtask-row.dragging {
+      opacity: 0.35;
+      background: var(--surface-subtle);
+    }
+    .subtask-row.drag-over-top {
+      box-shadow: 0 -2px 0 0 var(--primary);
+    }
+    .subtask-row.drag-over-bottom {
+      box-shadow: 0 2px 0 0 var(--primary);
     }
 
     .subtask-left {
@@ -1767,7 +1799,7 @@
         Спасибо за поддержку!
       </h3>
       <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;">
-        Приложение создано с заботой о людях с СДВГ, чтобы снизить тревожность от дел и дать мозгу заслуженный дофамин.
+        Приложение создано с заботой о людям с СДВГ, чтобы снизить тревожность от дел и дать мозгу заслуженный дофамин.
       </p>
       
       <div>
@@ -2635,7 +2667,11 @@
         btnDelete.className = 'btn-action-icon danger';
         btnDelete.title = 'Удалить';
         btnDelete.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>`;
-        btnDelete.addEventListener('click', () => deleteTaskWithUndo(task.id));
+        btnDelete.addEventListener('click', () => {
+          if (confirm(`Удалить запись «${task.title}»?`)) {
+            deleteTaskWithUndo(task.id);
+          }
+        });
 
         actions.appendChild(btnHyperfocus);
         actions.appendChild(btnBooster);
@@ -2689,10 +2725,90 @@
         const subBox = document.createElement('div');
         subBox.className = 'subtasks-wrapper';
 
-        (task.subtasks || []).forEach(st => {
+        (task.subtasks || []).forEach((st, stIndex) => {
           const row = document.createElement('div');
           row.id = `sub_${st.id}`;
           row.className = `subtask-row ${st.done ? 'checked' : ''}`;
+          row.dataset.index = stIndex;
+
+          const dragHandle = document.createElement('span');
+          dragHandle.className = 'subtask-drag-handle';
+          dragHandle.title = 'Перетащить';
+          dragHandle.innerHTML = `
+            <svg class="icon" style="width: 14px; height: 14px; pointer-events: none;" viewBox="0 0 24 24">
+              <circle cx="9" cy="6" r="1.5"></circle><circle cx="15" cy="6" r="1.5"></circle>
+              <circle cx="9" cy="12" r="1.5"></circle><circle cx="15" cy="12" r="1.5"></circle>
+              <circle cx="9" cy="18" r="1.5"></circle><circle cx="15" cy="18" r="1.5"></circle>
+            </svg>
+          `;
+
+          // Включаем draggable только при зажатии ручки
+          dragHandle.addEventListener('mousedown', () => {
+            row.draggable = true;
+          });
+          dragHandle.addEventListener('mouseup', () => {
+            row.draggable = false;
+          });
+
+          row.addEventListener('dragstart', (e) => {
+            row.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', JSON.stringify({ taskId: task.id, index: stIndex }));
+          });
+
+          row.addEventListener('dragend', () => {
+            row.draggable = false;
+            row.classList.remove('dragging');
+            subBox.querySelectorAll('.subtask-row').forEach(el => {
+              el.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+          });
+
+          row.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const rect = row.getBoundingClientRect();
+            const relY = e.clientY - rect.top;
+            const isTop = relY < rect.height / 2;
+
+            if (isTop) {
+              row.classList.add('drag-over-top');
+              row.classList.remove('drag-over-bottom');
+            } else {
+              row.classList.add('drag-over-bottom');
+              row.classList.remove('drag-over-top');
+            }
+          });
+
+          row.addEventListener('dragleave', (e) => {
+            // Игнорируем события от дочерних элементов внутри строки
+            if (row.contains(e.relatedTarget)) return;
+            row.classList.remove('drag-over-top', 'drag-over-bottom');
+          });
+
+          row.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = row.getBoundingClientRect();
+            const relY = e.clientY - rect.top;
+            const isTop = relY < rect.height / 2;
+
+            row.classList.remove('drag-over-top', 'drag-over-bottom');
+
+            try {
+              const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+              if (data.taskId === task.id) {
+                const fromIdx = Number(data.index);
+                let toIdx = isTop ? stIndex : stIndex + 1;
+                if (fromIdx < toIdx) toIdx--;
+                if (fromIdx !== toIdx) {
+                  reorderSubtasks(task.id, fromIdx, toIdx);
+                }
+              }
+            } catch (err) {}
+          });
 
           const leftWrap = document.createElement('div');
           leftWrap.className = 'subtask-left';
@@ -2740,6 +2856,7 @@
             deleteSubtask(task.id, st.id);
           });
 
+          row.appendChild(dragHandle);
           row.appendChild(leftWrap);
           row.appendChild(btnDelSub);
           subBox.appendChild(row);
@@ -2885,6 +3002,17 @@
         triggerCloudSync();
         renderAll();
       }
+    }
+
+    function reorderSubtasks(taskId, fromIndex, toIndex) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task || !task.subtasks) return;
+
+      const [moved] = task.subtasks.splice(fromIndex, 1);
+      task.subtasks.splice(toIndex, 0, moved);
+
+      triggerCloudSync();
+      renderSidebar();
     }
 
     function recalcProgressFromSteps(task) {
