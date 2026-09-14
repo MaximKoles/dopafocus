@@ -859,7 +859,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 3px 5px;
+      padding: 4px 6px;
       user-select: none;
       flex-shrink: 0;
       touch-action: none;
@@ -1799,7 +1799,7 @@
         Спасибо за поддержку!
       </h3>
       <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;">
-        Приложение создано с заботой о людям с СДВГ, чтобы снизить тревожность от дел и дать мозгу заслуженный дофамин.
+        Приложение создано с заботой о людях с СДВГ, чтобы снизить тревожность от дел и дать мозгу заслуженный дофамин.
       </p>
       
       <div>
@@ -2742,7 +2742,7 @@
             </svg>
           `;
 
-          // Включаем draggable только при зажатии ручки
+          // Десктопный drag-and-drop
           dragHandle.addEventListener('mousedown', () => {
             row.draggable = true;
           });
@@ -2782,7 +2782,6 @@
           });
 
           row.addEventListener('dragleave', (e) => {
-            // Игнорируем события от дочерних элементов внутри строки
             if (row.contains(e.relatedTarget)) return;
             row.classList.remove('drag-over-top', 'drag-over-bottom');
           });
@@ -2808,6 +2807,71 @@
                 }
               }
             } catch (err) {}
+          });
+
+          // Мобильный Touch drag-and-drop
+          let currentTouchTarget = null;
+          let isTouchTop = false;
+
+          dragHandle.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            row.classList.add('dragging');
+            currentTouchTarget = null;
+            if (navigator.vibrate) navigator.vibrate(20);
+          }, { passive: false });
+
+          dragHandle.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const touch = e.touches[0];
+            const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetRow = targetEl ? targetEl.closest('.subtask-row') : null;
+
+            subBox.querySelectorAll('.subtask-row').forEach(el => {
+              el.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
+            if (targetRow && targetRow !== row && subBox.contains(targetRow)) {
+              const rect = targetRow.getBoundingClientRect();
+              const relY = touch.clientY - rect.top;
+              isTouchTop = relY < rect.height / 2;
+              currentTouchTarget = targetRow;
+
+              if (isTouchTop) {
+                targetRow.classList.add('drag-over-top');
+              } else {
+                targetRow.classList.add('drag-over-bottom');
+              }
+            } else {
+              currentTouchTarget = null;
+            }
+          }, { passive: false });
+
+          dragHandle.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            row.classList.remove('dragging');
+            subBox.querySelectorAll('.subtask-row').forEach(el => {
+              el.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
+            if (currentTouchTarget && currentTouchTarget !== row) {
+              const fromIdx = stIndex;
+              const targetIdx = Number(currentTouchTarget.dataset.index);
+              let toIdx = isTouchTop ? targetIdx : targetIdx + 1;
+              if (fromIdx < toIdx) toIdx--;
+              if (fromIdx !== toIdx) {
+                reorderSubtasks(task.id, fromIdx, toIdx);
+              }
+            }
+            currentTouchTarget = null;
+          });
+
+          dragHandle.addEventListener('touchcancel', () => {
+            row.classList.remove('dragging');
+            subBox.querySelectorAll('.subtask-row').forEach(el => {
+              el.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+            currentTouchTarget = null;
           });
 
           const leftWrap = document.createElement('div');
