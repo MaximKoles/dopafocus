@@ -1154,6 +1154,47 @@
       gap: 4px;
     }
 
+    /* Кнопка выбора даты на Парковке */
+    .inbox-date-picker-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+      transition: all 0.15s ease;
+    }
+
+    .inbox-date-picker-wrap:hover {
+      border-color: var(--border-focus);
+      color: var(--text-main);
+      background: var(--surface-subtle);
+    }
+
+    .inbox-date-native-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      border: none;
+      z-index: 2;
+      -webkit-appearance: none;
+      display: block;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1687,7 +1728,7 @@
     let activeDate = new Date();
     let selectedDateString = formatDateToKey(new Date());
 
-    let currentTab = 'day'; // 'day' | 'calendar' | 'inbox'
+    let currentTab = 'day';
     let formCategory = 'home';
     let formIsFocus = false;
     let editingTaskId = null;
@@ -2127,7 +2168,6 @@
         head.appendChild(actions);
         card.appendChild(head);
 
-        // Ползунок выполнения
         const sliderBox = document.createElement('div');
         sliderBox.className = 'slider-interactive-box';
         sliderBox.innerHTML = `
@@ -2158,7 +2198,6 @@
 
         card.appendChild(sliderBox);
 
-        // Микрошаги с возможностью Drag-and-Drop
         const subBox = document.createElement('div');
         subBox.className = 'subtasks-wrapper';
 
@@ -2415,7 +2454,7 @@
 
       const triggerEditPicker = () => {
         if (typeof timeVal.showPicker === 'function') {
-          try { timeVal.showPicker(); } catch (err) {}
+          try { timeVal.showPicker(); } catch (err) { timeVal.focus(); }
         } else {
           timeVal.focus();
         }
@@ -2520,51 +2559,51 @@
           renderAll();
         });
 
-        // Плашка выбора даты с корректным нативным пикером для iOS и ПК
-        const datePickerWrap = document.createElement('div');
-        datePickerWrap.className = 'btn-quick-today';
-        datePickerWrap.style.background = 'var(--surface)';
-        datePickerWrap.style.border = '1px solid var(--border-soft)';
-        datePickerWrap.style.color = 'var(--text-main)';
-        datePickerWrap.style.position = 'relative';
-        datePickerWrap.style.cursor = 'pointer';
-        datePickerWrap.style.display = 'inline-flex';
-        datePickerWrap.style.alignItems = 'center';
-        datePickerWrap.style.gap = '5px';
-        datePickerWrap.title = 'Выбрать дату в календаре';
-        datePickerWrap.innerHTML = `
-          <svg class="icon" style="width: 14px; height: 14px; color: var(--text-dim);" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          <span>Выбрать дату</span>
+        // Кроссплатформенная плашка выбора даты
+        const dateWrap = document.createElement('div');
+        dateWrap.className = 'inbox-date-picker-wrap';
+        dateWrap.title = 'Выбрать дату для задачи';
+        dateWrap.innerHTML = `
+          <svg class="icon" style="width: 13px; height: 13px; color: var(--text-dim); pointer-events: none;" viewBox="0 0 24 24">
+            <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span style="pointer-events: none;">Выбрать дату</span>
+          <input type="date" class="inbox-date-native-input" tabindex="-1" />
         `;
 
-        const dateInput = document.createElement('input');
-        dateInput.type = 'date';
-        dateInput.style.position = 'absolute';
-        dateInput.style.top = '0';
-        dateInput.style.left = '0';
-        dateInput.style.width = '100%';
-        dateInput.style.height = '100%';
-        dateInput.style.opacity = '0';
-        dateInput.style.cursor = 'pointer';
-        dateInput.style.border = 'none';
-        dateInput.style.padding = '0';
-        dateInput.style.margin = '0';
-        dateInput.value = '';
-        dateInput.setAttribute('onkeydown', 'return false;');
-        dateInput.setAttribute('onpaste', 'return false;');
+        const dateInput = dateWrap.querySelector('.inbox-date-native-input');
+        
+        const openPicker = () => {
+          if (typeof dateInput.showPicker === 'function') {
+            try { 
+              dateInput.showPicker(); 
+            } catch (err) {
+              dateInput.focus();
+            }
+          } else {
+            dateInput.focus();
+          }
+        };
 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-        datePickerWrap.addEventListener('click', () => {
-          if (!isIOS && typeof dateInput.showPicker === 'function') {
-            try { dateInput.showPicker(); } catch (err) {}
+        dateWrap.addEventListener('click', (e) => {
+          if (e.target !== dateInput) {
+            openPicker();
           }
         });
 
+        dateInput.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openPicker();
+        });
+
         dateInput.addEventListener('change', (e) => {
-          if (e.target.value) {
-            task.date = e.target.value;
-            selectedDateString = e.target.value;
+          const chosen = e.target.value;
+          if (chosen) {
+            task.date = chosen;
+            selectedDateString = chosen;
             currentTab = 'day';
             updateTabSwitcherUI();
             triggerCloudSync();
@@ -2572,9 +2611,8 @@
           }
         });
 
-        datePickerWrap.appendChild(dateInput);
         tools.appendChild(btnToday);
-        tools.appendChild(datePickerWrap);
+        tools.appendChild(dateWrap);
         card.appendChild(header);
         card.appendChild(tools);
         container.appendChild(card);
@@ -3018,7 +3056,7 @@
 
       const triggerTimePicker = () => {
         if (typeof timeInput.showPicker === 'function') {
-          try { timeInput.showPicker(); } catch (err) {}
+          try { timeInput.showPicker(); } catch (err) { timeInput.focus(); }
         } else {
           timeInput.focus();
         }
