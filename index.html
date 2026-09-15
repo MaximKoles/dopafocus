@@ -2520,27 +2520,47 @@
           renderAll();
         });
 
+        // Плашка выбора даты с корректным нативным пикером для iOS и ПК
+        const datePickerWrap = document.createElement('div');
+        datePickerWrap.className = 'btn-quick-today';
+        datePickerWrap.style.background = 'var(--surface)';
+        datePickerWrap.style.border = '1px solid var(--border-soft)';
+        datePickerWrap.style.color = 'var(--text-main)';
+        datePickerWrap.style.position = 'relative';
+        datePickerWrap.style.cursor = 'pointer';
+        datePickerWrap.style.display = 'inline-flex';
+        datePickerWrap.style.alignItems = 'center';
+        datePickerWrap.style.gap = '5px';
+        datePickerWrap.title = 'Выбрать дату в календаре';
+        datePickerWrap.innerHTML = `
+          <svg class="icon" style="width: 14px; height: 14px; color: var(--text-dim);" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span>Выбрать дату</span>
+        `;
+
         const dateInput = document.createElement('input');
         dateInput.type = 'date';
-        dateInput.className = 'input-field';
-        dateInput.style.padding = '4px 8px';
-        dateInput.style.fontSize = '0.8rem';
-        dateInput.style.width = 'auto';
+        dateInput.style.position = 'absolute';
+        dateInput.style.top = '0';
+        dateInput.style.left = '0';
+        dateInput.style.width = '100%';
+        dateInput.style.height = '100%';
+        dateInput.style.opacity = '0';
         dateInput.style.cursor = 'pointer';
+        dateInput.style.border = 'none';
+        dateInput.style.padding = '0';
+        dateInput.style.margin = '0';
         dateInput.value = '';
         dateInput.setAttribute('onkeydown', 'return false;');
         dateInput.setAttribute('onpaste', 'return false;');
-        
-        const openDatePicker = () => {
-          if (typeof dateInput.showPicker === 'function') {
-            try { dateInput.showPicker(); } catch (err) {}
-          } else {
-            dateInput.focus();
-          }
-        };
 
-        dateInput.addEventListener('click', openDatePicker);
-        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        datePickerWrap.addEventListener('click', () => {
+          if (!isIOS && typeof dateInput.showPicker === 'function') {
+            try { dateInput.showPicker(); } catch (err) {}
+          }
+        });
+
         dateInput.addEventListener('change', (e) => {
           if (e.target.value) {
             task.date = e.target.value;
@@ -2552,8 +2572,9 @@
           }
         });
 
+        datePickerWrap.appendChild(dateInput);
         tools.appendChild(btnToday);
-        tools.appendChild(dateInput);
+        tools.appendChild(datePickerWrap);
         card.appendChild(header);
         card.appendChild(tools);
         container.appendChild(card);
