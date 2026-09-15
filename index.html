@@ -1416,8 +1416,8 @@
           id="brainDumpInput" 
           class="brain-dump-input" 
           placeholder="Припарковать мысль..." 
-          maxlength="120"
-          autocomplete="off"
+          maxlength="120" 
+          autocomplete="off" 
           required 
         />
         <button type="submit" class="brain-dump-btn" title="Отправить на парковку">
@@ -2575,7 +2575,8 @@
         `;
 
         const dateInput = dateWrap.querySelector('.inbox-date-native-input');
-        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
         const openPicker = () => {
           if (typeof dateInput.showPicker === 'function') {
             try { 
@@ -2588,19 +2589,7 @@
           }
         };
 
-        dateWrap.addEventListener('click', (e) => {
-          if (e.target !== dateInput) {
-            openPicker();
-          }
-        });
-
-        dateInput.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openPicker();
-        });
-
-        dateInput.addEventListener('change', (e) => {
-          const chosen = e.target.value;
+        const applySelectedDate = (chosen) => {
           if (chosen) {
             task.date = chosen;
             selectedDateString = chosen;
@@ -2609,7 +2598,33 @@
             triggerCloudSync();
             renderAll();
           }
-        });
+        };
+
+        if (isIOS) {
+          // Изолированная обработка для iOS: инпут перекрывает плашку, нативный барабан открывается сам
+          dateInput.addEventListener('change', () => {
+            // Ожидаем завершения выбора пользователем на iOS
+            dateInput.addEventListener('blur', () => {
+              applySelectedDate(dateInput.value);
+            }, { once: true });
+          });
+        } else {
+          // Оригинальная обработка для ПК
+          dateWrap.addEventListener('click', (e) => {
+            if (e.target !== dateInput) {
+              openPicker();
+            }
+          });
+
+          dateInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openPicker();
+          });
+
+          dateInput.addEventListener('change', (e) => {
+            applySelectedDate(e.target.value);
+          });
+        }
 
         tools.appendChild(btnToday);
         tools.appendChild(dateWrap);
