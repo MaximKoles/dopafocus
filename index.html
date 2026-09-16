@@ -1718,10 +1718,17 @@
       "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     ];
 
-    const WORDS_POOL = [
-      'персик', 'луна', 'маяк', 'кофе', 'лес', 'ветерок', 'искра', 'янтарь',
-      'клевер', 'океан', 'рассвет', 'уют', 'салют', 'компас', 'остров', 'туман'
-    ];
+const WORDS_POOL = [
+  // Исходные
+  'персик', 'луна', 'маяк', 'кофе', 'лес', 'ветерок', 'искра', 'янтарь',
+  'клевер', 'океан', 'рассвет', 'уют', 'салют', 'компас', 'остров', 'туман',
+  'гроза', 'волна', 'родник', 'утёс', 'кедр', 'сосна', 'пламя', 'капля',
+  'заря', 'радуга', 'вьюга', 'пустыня', 'каньон', 'скала', 'мороз', 'трава',
+  'тигр', 'сокол', 'кит', 'рысь', 'лиса', 'дельфин', 'зебра', 'панда',
+  'звезда', 'комета', 'орбита', 'метеор', 'галактика', 'пульсар',
+  'парус', 'атлас', 'штурвал', 'фонарь', 'кристалл', 'магнит', 'рубин',
+  'жемчуг', 'лабиринт', 'мост', 'купол', 'башня', 'алмаз', 'якорь'
+];
 
     let tasks = [];
     let settings = { totalWins: 0, lastUpdated: 0 };
@@ -1872,12 +1879,13 @@
       return `${d.getDate()} ${monthsShort[d.getMonth()]}`;
     }
 
-    function generateSecurePassphrase() {
-      const w1 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
-      const w2 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
-      const num = Math.floor(Math.random() * 89) + 10;
-      return `${w1}-${w2}-${num}`;
-    }
+function generateSecurePassphrase() {
+  const w1 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
+  const w2 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
+  const w3 = WORDS_POOL[Math.floor(Math.random() * WORDS_POOL.length)];
+  const num = Math.floor(Math.random() * 89) + 10;
+  return `${w1}-${w2}-${w3}-${num}`;
+}
 
     function normalizeTaskCompatibility(t) {
       if (!t.category) t.category = 'home';
